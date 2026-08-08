@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports — Imvula Labs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/application.css">
+</head>
+<body>
+<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <nav>
+            <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
+            <a href="assessments.html"><span class="icon">◇</span><span>Assessments</span></a>
+            <a href="reports.html" class="active"><span class="icon">▣</span><span>Reports</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Security</span></a>
+        </nav>
+        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+    </aside>
+    <main class="main-content">
+        <div class="page-header"><h1>Reports</h1><span class="badge medium">DEMO MODE</span></div>
+        <div class="card">
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Name</th><th>Date</th><th>Type</th><th>Status</th></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <p style="color:var(--warning);font-size:10px;margin-top:12px;">⚠ All reports shown are simulated for demonstration purposes.</p>
+        </div>
+    </main>
+</div>
+<div class="demo-watermark">DEMO</div>
+<script src="../data/demo-data.js"></script>
+<script>
+    const tbody = document.getElementById('tableBody');
+    DEMO.reports.forEach(r => {
+        tbody.innerHTML += `<tr>
+            <td>${r.id}</td><td>${r.name}</td><td>${r.date}</td><td>${r.type}</td>
+            <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
+        </tr>`;
+    });
+</script>
+</body>
+</html>

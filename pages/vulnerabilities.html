@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerabilities — Imvula Labs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/application.css">
+</head>
+<body>
+<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <nav>
+            <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
+            <a href="vulnerabilities.html" class="active"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
+            <a href="assessments.html"><span class="icon">◇</span><span>Assessments</span></a>
+            <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Security</span></a>
+        </nav>
+        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+    </aside>
+    <main class="main-content">
+        <div class="page-header"><h1>Vulnerabilities</h1><span class="badge medium">DEMO MODE</span></div>
+        <div class="card">
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Title</th><th>CVSS</th><th>Severity</th><th>Asset</th><th>Status</th><th>Discovered</th></tr></thead>
+                <tbody id="vulnTableBody"></tbody>
+            </table>
+            <p style="color:var(--warning);font-size:10px;margin-top:12px;">⚠ All vulnerabilities shown are simulated for demonstration purposes.</p>
+        </div>
+    </main>
+</div>
+<div class="demo-watermark">DEMO</div>
+<script src="../data/demo-data.js"></script>
+<script>
+    const tbody = document.getElementById('vulnTableBody');
+    DEMO.vulnerabilities.forEach(v => {
+        tbody.innerHTML += `<tr>
+            <td>${v.id}</td><td>${v.title}</td><td>${v.cvss}</td>
+            <td><span class="badge ${v.severity.toLowerCase()}">${v.severity}</span></td>
+            <td>${v.asset}</td>
+            <td><span class="badge ${v.status.toLowerCase().replace(/ /g,'')}">${v.status}</span></td>
+            <td>${v.discovered}</td>
+        </tr>`;
+    });
+</script>
+</body>
+</html>

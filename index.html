@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imvula Labs | Ethical Penetration Testing</title>
+    <meta name="description" content="Imvula Labs delivers ethical penetration testing, vulnerability assessment and cybersecurity solutions. We break your web apps before criminals do.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="navbar">
+    <a href="#" class="brand">
+        <img src="assets/logo.svg" alt="Imvula Labs logo">
+        <span>Imvula<span class="accent">Labs</span></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation">☰</button>
+    <nav id="navMenu">
+        <a href="#services">Services</a>
+        <a href="#ai-security">AI Security</a>
+        <a href="#process">Process</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="pages/dashboard.html">Demo Dashboard</a>
+    </nav>
+</header>
+<main>
+<section class="hero">
+    <div class="hero-content">
+        <div class="status"><span></span>IMVULA SECURITY — DEMO MODE</div>
+        <h1>We break your web apps <strong>before criminals do.</strong></h1>
+        <p class="hero-description">Imvula Labs combines ethical penetration testing and security intelligence to help businesses identify and fix vulnerabilities before attackers exploit them.</p>
+        <div class="hero-buttons">
+            <a href="#contact" class="btn primary">Request Security Assessment →</a>
+            <a href="#services" class="btn secondary">Explore Services</a>
+        </div>
+        <div class="hero-trust">
+            <span>✓ Ethical Testing</span>
+            <span>✓ Actionable Reports</span>
+            <span>✓ POPIA-Aligned</span>
+        </div>
+    </div>
+    <div class="security-panel">
+        <div class="panel-header">
+            <div><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+            <span>imvula-security-engine</span>
+            <span class="online">● DEMO</span>
+        </div>
+        <div class="terminal" id="terminal">
+            <div class="terminal-line"><span class="prompt">$</span> initializing security engine...</div>
+        </div>
+        <div class="security-score">
+            <div><small>DEMO SCORE</small><strong>94<span>/100</span></strong></div>
+            <div class="score-ring"><span>94%</span></div>
+        </div>
+    </div>
+</section>
+<section id="services" class="section">
+    <div class="section-heading">
+        <span class="eyebrow">SECURITY SERVICES</span>
+        <h2>Find weaknesses before attackers do.</h2>
+        <p>Practical security testing designed to identify, explain and help remediate real-world vulnerabilities.</p>
+    </div>
+    <div class="service-grid">
+        <article class="service-card">
+            <div class="service-icon">⌁</div>
+            <h3>Web Application Testing</h3>
+            <p>Identify authentication issues, injection risks, access-control weaknesses and other application security vulnerabilities.</p>
+            <span class="card-link">Learn more →</span>
+        </article>
+        <article class="service-card">
+            <div class="service-icon">◈</div>
+            <h3>API Security Testing</h3>
+            <p>Assess APIs for authorization problems, exposed data, insecure endpoints and common API security weaknesses.</p>
+            <span class="card-link">Learn more →</span>
+        </article>
+        <article class="service-card">
+            <div class="service-icon">⌬</div>
+            <h3>Vulnerability Assessment</h3>
+            <p>Discover security weaknesses and prioritize remediation according to potential business impact.</p>
+            <span class="card-link">Learn more →</span>
+        </article>
+        <article class="service-card">
+            <div class="service-icon">◇</div>
+            <h3>Secure Code Review</h3>
+            <p>Review application code for security flaws and provide practical recommendations for developers.</p>
+            <span class="card-link">Learn more →</span>
+        </article>
+    </div>
+</section>
+<section id="ai-security" class="section ai-section">
+    <div class="ai-copy">
+        <span class="eyebrow">AI SECURITY INTELLIGENCE</span>
+        <h2>Human expertise. <span>Machine intelligence.</span></h2>
+        <p>Our future AI security layer helps transform complex security information into clear, actionable intelligence.</p>
+        <ul class="feature-list">
+            <li><span>✓</span> Natural-language security analysis</li>
+            <li><span>✓</span> AI-assisted vulnerability explanations</li>
+            <li><span>✓</span> Automated report summarization</li>
+            <li><span>✓</span> Intelligent risk prioritization</li>
+        </ul>
+    </div>
+    <div class="assistant">
+        <div class="assistant-header">
+            <div class="assistant-avatar">AI</div>
+            <div><strong>Imvula Security Assistant</strong><small>AI analysis engine — DEMO</small></div>
+            <span class="assistant-status">● DEMO</span>
+        </div>
+        <div class="chat">
+            <div class="message user-message">Analyze my application's security posture.</div>
+            <div class="message ai-message">
+                <strong>Imvula AI</strong>
+                <p>I can help organize security findings, explain vulnerabilities and prioritize remediation.</p>
+                <div class="risk-row"><span>Risk level</span><strong class="medium">MEDIUM</strong></div>
+                <div class="risk-row"><span>Findings</span><strong>12</strong></div>
+                <div class="risk-row"><span>Critical</span><strong class="critical">1</strong></div>
+            </div>
+        </div>
+        <div class="assistant-input"><span>Ask a security question...</span><button>→</button></div>
+    </div>
+</section>
+<section id="process" class="section">
+    <div class="section-heading">
+        <span class="eyebrow">OUR PROCESS</span>
+        <h2>Security testing with purpose.</h2>
+    </div>
+    <div class="process-grid">
+        <div class="process-step"><span>01</span><h3>Reconnaissance</h3><p>Understand the authorized attack surface.</p></div>
+        <div class="process-step"><span>02</span><h3>Testing</h3><p>Identify and validate security weaknesses.</p></div>
+        <div class="process-step"><span>03</span><h3>Analysis</h3><p>Assess severity and potential business impact.</p></div>
+        <div class="process-step"><span>04</span><h3>Reporting</h3><p>Deliver clear findings and recommendations.</p></div>
+        <div class="process-step"><span>05</span><h3>Remediation</h3><p>Help teams understand how to fix the weaknesses.</p></div>
+    </div>
+</section>
+<section id="about" class="section about-section">
+    <div class="about-box">
+        <span class="eyebrow">ABOUT IMVULA LABS</span>
+        <h2>Building a safer digital future.</h2>
+        <p>Imvula Labs is focused on ethical cybersecurity, penetration testing and AI-assisted security innovation. Our goal is simple: help organizations understand their security weaknesses and make better security decisions.</p>
+    </div>
+</section>
+<section id="contact" class="contact-section">
+    <div>
+        <span class="eyebrow">START A CONVERSATION</span>
+        <h2>Ready to test your security?</h2>
+        <p>Tell us about your application or security requirements and start a conversation with Imvula Labs.</p>
+        <a href="mailto:info@imvulalabs.co.za" class="btn primary">Contact Imvula Labs →</a>
+    </div>
+</section>
+</main>
+<footer>
+    <div class="footer-brand"><img src="assets/logo.svg" alt="Imvula Labs"><strong>Imvula Labs</strong></div>
+    <p>© 2026 Imvula Labs. Ethical Cybersecurity. All demo data is simulated.</p>
+</footer>
+<div class="demo-watermark">DEMO</div>
+<script src="script.js"></script>
+</body>
+</html>
