@@ -3,49 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vulnerabilities — Imvula Labs</title>
+    <title>Risks — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../css/application.css">
+    <style>
+        .risk-form { display: grid; grid-template-columns: 2fr 2fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+        .risk-form input, .risk-form select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        .risk-form input:focus, .risk-form select:focus { outline: none; border-color: #2563eb; }
+        .risk-form button { padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .risk-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .form-error { color: #991b1b; background: #fef2f2; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+        .form-error.show { display: block; }
+        .no-assets { background: #fef3c7; color: #92400e; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+        .no-assets.show { display: block; }
+        .filters { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
+        .filters select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        @media (max-width: 768px) { .risk-form { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
-<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <div class="sidebar-brand">
+            <img src="../assets/logo.svg" alt="Imvula Labs">
+            <span>Imvula<span class="accent">Labs</span></span>
+        </div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
-            <a href="vulnerabilities.html" class="active"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="vulnerabilities.html" class="active"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
-            <a href="assessments.html"><span class="icon">◇</span><span>Assessments</span></a>
             <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
-            <a href="ai-security.html"><span class="icon">◎</span><span>AI Security</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
+            <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
         </nav>
-        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+        <div class="sidebar-footer" id="userFooter">—</div>
     </aside>
     <main class="main-content">
-        <div class="page-header"><h1>Vulnerabilities</h1><span class="badge medium">DEMO MODE</span></div>
+        <div class="page-header"><h1>Security Risks</h1><span class="badge medium" id="countBadge">—</span></div>
+
         <div class="card">
+            <h3>Report a Risk</h3>
+            <div class="no-assets" id="noAssetsWarn">
+                You need at least one asset first. <a href="assets.html">Add an asset</a>.
+            </div>
+            <div class="form-error" id="formError"></div>
+            <form class="risk-form" id="riskForm">
+                <input type="text" id="riskTitle" placeholder="Risk title (e.g. Missing HTTPS)" required maxlength="200">
+                <select id="riskAsset" required>
+                    <option value="">Select asset...</option>
+                </select>
+                <select id="riskSeverity" required>
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+                <button type="submit" id="submitBtn">Add Risk</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="filters">
+                <label for="severityFilter" style="font-size:13px;color:var(--muted);">Filter:</label>
+                <select id="severityFilter">
+                    <option value="">All severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Title</th><th>CVSS</th><th>Severity</th><th>Asset</th><th>Status</th><th>Discovered</th></tr></thead>
-                <tbody id="vulnTableBody"></tbody>
+                <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Asset</th></tr></thead>
+                <tbody id="risksBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
             </table>
-            <p style="color:var(--warning);font-size:10px;margin-top:12px;">⚠ All vulnerabilities shown are simulated for demonstration purposes.</p>
         </div>
     </main>
 </div>
-<div class="demo-watermark">DEMO</div>
-<script src="../data/demo-data.js"></script>
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
 <script>
-    const tbody = document.getElementById('vulnTableBody');
-    DEMO.vulnerabilities.forEach(v => {
-        tbody.innerHTML += `<tr>
-            <td>${v.id}</td><td>${v.title}</td><td>${v.cvss}</td>
-            <td><span class="badge ${v.severity.toLowerCase()}">${v.severity}</span></td>
-            <td>${v.asset}</td>
-            <td><span class="badge ${v.status.toLowerCase().replace(/ /g,'')}">${v.status}</span></td>
-            <td>${v.discovered}</td>
-        </tr>`;
+(function () {
+    if (!window.ImvulaAuth.isLoggedIn()) {
+        window.location.href = window.IMVULA.url("pages/login.html");
+        return;
+    }
+
+    document.getElementById("logoutLink").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.ImvulaAuth.logout();
     });
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+    }
+
+    var assetMap = {};
+
+    function loadAssetsForForm() {
+        return window.ImvulaAuth.api("/quantum/assets").then(function (assets) {
+            var sel = document.getElementById("riskAsset");
+            assetMap = {};
+            sel.innerHTML = '<option value="">Select asset...</option>';
+            assets.forEach(function (a) {
+                assetMap[a.id] = a.name;
+                sel.innerHTML += '<option value="' + a.id + '">' + esc(a.name) + "</option>";
+            });
+
+            var warn = document.getElementById("noAssetsWarn");
+            var form = document.getElementById("riskForm");
+            if (assets.length === 0) {
+                warn.classList.add("show");
+                form.style.display = "none";
+            } else {
+                warn.classList.remove("show");
+                form.style.display = "";
+            }
+        });
+    }
+
+    function loadRisks() {
+        var sev = document.getElementById("severityFilter").value;
+        var q = sev ? "?severity=" + encodeURIComponent(sev) : "";
+        return window.ImvulaAuth.api("/quantum/risks" + q).then(function (risks) {
+            var tbody = document.getElementById("risksBody");
+            document.getElementById("countBadge").textContent =
+                risks.length + " risk" + (risks.length === 1 ? "" : "s");
+
+            if (risks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No risks yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = risks.map(function (r) {
+                return "<tr>" +
+                    "<td>#" + r.id + "</td>" +
+                    "<td>" + esc(r.title) + "</td>" +
+                    '<td><span class="badge ' + esc(r.severity) + '">' + esc(r.severity) + "</span></td>" +
+                    '<td><span class="badge ' + esc(r.status).replace(/[\s_]/g, "") + '">' + esc(r.status) + "</span></td>" +
+                    "<td>" + esc(assetMap[r.asset_id] || ("#" + r.asset_id)) + "</td>" +
+                    "</tr>";
+            }).join("");
+        });
+    }
+
+    document.getElementById("severityFilter").addEventListener("change", loadRisks);
+
+    var form = document.getElementById("riskForm");
+    var btn = document.getElementById("submitBtn");
+    var errBox = document.getElementById("formError");
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        errBox.classList.remove("show");
+        btn.disabled = true;
+        btn.textContent = "Adding...";
+
+        window.ImvulaAuth.api("/quantum/risks", {
+            method: "POST",
+            body: {
+                title: document.getElementById("riskTitle").value.trim(),
+                asset_id: parseInt(document.getElementById("riskAsset").value, 10),
+                severity: document.getElementById("riskSeverity").value,
+                description: ""
+            }
+        }).then(function () {
+            form.reset();
+            document.getElementById("riskSeverity").value = "medium";
+            btn.disabled = false;
+            btn.textContent = "Add Risk";
+            return loadRisks();
+        }).catch(function (err) {
+            errBox.textContent = err.message || "Failed to create risk";
+            errBox.classList.add("show");
+            btn.disabled = false;
+            btn.textContent = "Add Risk";
+        });
+    });
+
+    window.ImvulaAuth.me().then(function (user) {
+        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
+        return loadAssetsForForm();
+    }).then(loadRisks).catch(function (err) {
+        errBox.textContent = "Error: " + (err.message || "failed to load");
+        errBox.classList.add("show");
+    });
+})();
 </script>
 </body>
 </html>

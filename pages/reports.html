@@ -3,46 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports — Imvula Labs</title>
+    <title>AI Usage — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../css/application.css">
+    <style>
+        .usage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .usage-stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; }
+        .usage-stat-label { font-size: 11px; color: #6b7280; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .usage-stat-value { font-size: 28px; font-weight: 700; color: #111827; margin-top: 4px; }
+        .notice { background: #fef3c7; color: #92400e; padding: 12px 16px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; }
+        .notice.info { background: #eef2ff; color: #3730a3; }
+        @media (max-width: 900px) { .usage-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .usage-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
-<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <div class="sidebar-brand">
+            <img src="../assets/logo.svg" alt="Imvula Labs">
+            <span>Imvula<span class="accent">Labs</span></span>
+        </div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
-            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
-            <a href="assessments.html"><span class="icon">◇</span><span>Assessments</span></a>
-            <a href="reports.html" class="active"><span class="icon">▣</span><span>Reports</span></a>
-            <a href="ai-security.html"><span class="icon">◎</span><span>AI Security</span></a>
+            <a href="reports.html" class="active"><span class="icon">▣</span><span>AI Usage</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
+            <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
         </nav>
-        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+        <div class="sidebar-footer" id="userFooter">—</div>
     </aside>
     <main class="main-content">
-        <div class="page-header"><h1>Reports</h1><span class="badge medium">DEMO MODE</span></div>
+        <div class="page-header"><h1>AI Usage</h1><span class="badge medium" id="scopeBadge">—</span></div>
+
+        <div class="notice info" id="scopeNotice">Loading usage data...</div>
+
+        <div class="usage-grid">
+            <div class="usage-stat">
+                <div class="usage-stat-label">Total Calls</div>
+                <div class="usage-stat-value" id="totalCalls">—</div>
+            </div>
+            <div class="usage-stat">
+                <div class="usage-stat-label">Successful</div>
+                <div class="usage-stat-value" id="successCalls">—</div>
+            </div>
+            <div class="usage-stat">
+                <div class="usage-stat-label">Failed</div>
+                <div class="usage-stat-value" id="failedCalls">—</div>
+            </div>
+            <div class="usage-stat">
+                <div class="usage-stat-label">Prompt Chars</div>
+                <div class="usage-stat-value" id="totalChars">—</div>
+            </div>
+        </div>
+
         <div class="card">
+            <h3>Recent AI Activity</h3>
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Name</th><th>Date</th><th>Type</th><th>Status</th></tr></thead>
-                <tbody id="tableBody"></tbody>
+                <thead><tr><th>When</th><th>Provider</th><th>Prompt Preview</th><th>Chars</th><th>Status</th></tr></thead>
+                <tbody id="usageBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
             </table>
-            <p style="color:var(--warning);font-size:10px;margin-top:12px;">⚠ All reports shown are simulated for demonstration purposes.</p>
         </div>
     </main>
 </div>
-<div class="demo-watermark">DEMO</div>
-<script src="../data/demo-data.js"></script>
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
 <script>
-    const tbody = document.getElementById('tableBody');
-    DEMO.reports.forEach(r => {
-        tbody.innerHTML += `<tr>
-            <td>${r.id}</td><td>${r.name}</td><td>${r.date}</td><td>${r.type}</td>
-            <td><span class="badge ${r.status.toLowerCase()}">${r.status}</span></td>
-        </tr>`;
+(function () {
+    if (!window.ImvulaAuth.isLoggedIn()) {
+        window.location.href = window.IMVULA.url("pages/login.html");
+        return;
+    }
+
+    document.getElementById("logoutLink").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.ImvulaAuth.logout();
     });
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+    }
+
+    function fmtDate(iso) {
+        if (!iso) return "—";
+        try {
+            var d = new Date(iso.includes("Z") || iso.includes("+") ? iso : iso + "Z");
+            return d.toLocaleString();
+        } catch (e) { return iso; }
+    }
+
+    function render(usage, isAdmin) {
+        var scopeBadge = document.getElementById("scopeBadge");
+        var scopeNotice = document.getElementById("scopeNotice");
+        scopeBadge.textContent = isAdmin ? "Org-wide" : "Personal";
+
+        var total = usage.length;
+        var success = usage.filter(function (u) { return u.success; }).length;
+        var failed = total - success;
+        var chars = usage.reduce(function (s, u) { return s + (u.prompt_chars || 0); }, 0);
+
+        document.getElementById("totalCalls").textContent = total;
+        document.getElementById("successCalls").textContent = success;
+        document.getElementById("failedCalls").textContent = failed;
+        document.getElementById("totalChars").textContent = chars.toLocaleString();
+
+        if (total === 0) {
+            scopeNotice.textContent = isAdmin
+                ? "No AI calls yet in this organisation. Try the AI Gateway via /docs or the Guardian page."
+                : "You haven't made any AI calls yet.";
+        } else if (isAdmin) {
+            scopeNotice.textContent = "Showing all AI activity in your organisation (admin view).";
+        } else {
+            scopeNotice.textContent = "Showing only your own AI activity. Contact an admin to see org-wide usage.";
+        }
+
+        var tbody = document.getElementById("usageBody");
+        if (usage.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No AI calls recorded yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = usage.map(function (u) {
+            return "<tr>" +
+                "<td>" + esc(fmtDate(u.created_at)) + "</td>" +
+                "<td>" + esc(u.provider) + "</td>" +
+                "<td style='max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'>" + esc(u.prompt_preview) + "</td>" +
+                "<td>" + (u.prompt_chars || 0) + "</td>" +
+                '<td><span class="badge ' + (u.success ? "success" : "critical") + '">' + (u.success ? "OK" : "Failed") + "</span></td>" +
+                "</tr>";
+        }).join("");
+    }
+
+    window.ImvulaAuth.me().then(function (user) {
+        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
+
+        var isAdmin = user.role === "owner" || user.role === "admin";
+        var path = isAdmin ? "/ai/usage" : "/ai/usage/me";
+
+        return window.ImvulaAuth.api(path).then(function (usage) {
+            render(usage || [], isAdmin);
+        });
+    }).catch(function (err) {
+        document.getElementById("scopeNotice").textContent = "Error: " + (err.message || "failed to load usage");
+        document.getElementById("scopeNotice").style.background = "#fef2f2";
+        document.getElementById("scopeNotice").style.color = "#991b1b";
+    });
+})();
 </script>
 </body>
 </html>

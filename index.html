@@ -20,7 +20,7 @@
         <a href="#process">Process</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
-        <a href="pages/dashboard.html">Demo Dashboard</a>
+        <a href="pages/login.html" id="navAuthLink">Sign In</a>
     </nav>
 </header>
 <main>
@@ -153,5 +153,18 @@
 </footer>
 <div class="demo-watermark">DEMO</div>
 <script src="script.js"></script>
+<script src="js/imvula-config.js"></script>
+<script>
+(function () {
+    var link = document.getElementById("navAuthLink");
+    if (!link) return;
+    try {
+        if (localStorage.getItem("imvula_token")) {
+            link.textContent = "Dashboard";
+            link.href = window.IMVULA.url("pages/dashboard.html");
+        }
+    } catch (e) {}
+})();
+</script>
 </body>
 </html>

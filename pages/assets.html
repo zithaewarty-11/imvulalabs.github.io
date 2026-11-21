@@ -6,43 +6,153 @@
     <title>Assets — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../css/application.css">
+    <style>
+        .asset-form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+        .asset-form input, .asset-form select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .asset-form button { padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .asset-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .asset-form input:focus, .asset-form select:focus { outline: none; border-color: #2563eb; }
+        .form-error { color: #991b1b; background: #fef2f2; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+        .form-error.show { display: block; }
+        @media (max-width: 768px) { .asset-form { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
-<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <div class="sidebar-brand">
+            <img src="../assets/logo.svg" alt="Imvula Labs">
+            <span>Imvula<span class="accent">Labs</span></span>
+        </div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
-            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="assets.html" class="active"><span class="icon">⌬</span><span>Assets</span></a>
-            <a href="assessments.html"><span class="icon">◇</span><span>Assessments</span></a>
             <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
-            <a href="ai-security.html"><span class="icon">◎</span><span>AI Security</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
+            <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
         </nav>
-        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+        <div class="sidebar-footer" id="userFooter">—</div>
     </aside>
     <main class="main-content">
-        <div class="page-header"><h1>Assets</h1><span class="badge medium">DEMO MODE</span></div>
+        <div class="page-header"><h1>Business Assets</h1><span class="badge medium" id="countBadge">—</span></div>
+
         <div class="card">
+            <h3>Add an Asset</h3>
+            <div class="form-error" id="formError"></div>
+            <form class="asset-form" id="assetForm">
+                <input type="text" id="assetName" placeholder="Asset name (e.g. Company website)" required maxlength="200">
+                <select id="assetType" required>
+                    <option value="">Type...</option>
+                    <option value="website">Website</option>
+                    <option value="email">Email</option>
+                    <option value="server">Server</option>
+                    <option value="database">Database</option>
+                    <option value="saas_app">SaaS App</option>
+                    <option value="other">Other</option>
+                </select>
+                <select id="assetCriticality" required>
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+                <button type="submit" id="submitBtn">Add Asset</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Your Assets</h3>
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Name</th><th>URL</th><th>Type</th><th>Risk Level</th></tr></thead>
-                <tbody id="tableBody"></tbody>
+                <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Criticality</th><th>Created</th></tr></thead>
+                <tbody id="assetsBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
             </table>
-            <p style="color:var(--warning);font-size:10px;margin-top:12px;">⚠ All assets shown are simulated for demonstration purposes.</p>
         </div>
     </main>
 </div>
-<div class="demo-watermark">DEMO</div>
-<script src="../data/demo-data.js"></script>
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
 <script>
-    const tbody = document.getElementById('tableBody');
-    DEMO.assets.forEach(a => {
-        tbody.innerHTML += `<tr>
-            <td>${a.id}</td><td>${a.name}</td><td>${a.url}</td><td>${a.type}</td>
-            <td><span class="badge ${a.risk.toLowerCase()}">${a.risk}</span></td>
-        </tr>`;
+(function () {
+    if (!window.ImvulaAuth.isLoggedIn()) {
+        window.location.href = window.IMVULA.url("pages/login.html");
+        return;
+    }
+
+    document.getElementById("logoutLink").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.ImvulaAuth.logout();
     });
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+    }
+
+    function loadAssets() {
+        return window.ImvulaAuth.api("/quantum/assets").then(function (assets) {
+            var tbody = document.getElementById("assetsBody");
+            document.getElementById("countBadge").textContent =
+                assets.length + " asset" + (assets.length === 1 ? "" : "s");
+
+            if (!assets || assets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No assets yet. Add one above.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = assets.map(function (a) {
+                return "<tr>" +
+                    "<td>#" + a.id + "</td>" +
+                    "<td>" + esc(a.name) + "</td>" +
+                    "<td>" + esc(a.asset_type) + "</td>" +
+                    '<td><span class="badge ' + esc(a.criticality) + '">' + esc(a.criticality) + "</span></td>" +
+                    "<td>—</td>" +
+                    "</tr>";
+            }).join("");
+        });
+    }
+
+    var form = document.getElementById("assetForm");
+    var btn = document.getElementById("submitBtn");
+    var errBox = document.getElementById("formError");
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        errBox.classList.remove("show");
+        btn.disabled = true;
+        btn.textContent = "Adding...";
+
+        window.ImvulaAuth.api("/quantum/assets", {
+            method: "POST",
+            body: {
+                name: document.getElementById("assetName").value.trim(),
+                asset_type: document.getElementById("assetType").value,
+                criticality: document.getElementById("assetCriticality").value,
+                description: ""
+            }
+        }).then(function () {
+            form.reset();
+            document.getElementById("assetCriticality").value = "medium";
+            btn.disabled = false;
+            btn.textContent = "Add Asset";
+            return loadAssets();
+        }).catch(function (err) {
+            errBox.textContent = err.message || "Failed to create asset";
+            errBox.classList.add("show");
+            btn.disabled = false;
+            btn.textContent = "Add Asset";
+        });
+    });
+
+    window.ImvulaAuth.me().then(function (user) {
+        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
+        return loadAssets();
+    }).catch(function (err) {
+        errBox.textContent = "Error: " + (err.message || "failed to load");
+        errBox.classList.add("show");
+    });
+})();
 </script>
 </body>
 </html>

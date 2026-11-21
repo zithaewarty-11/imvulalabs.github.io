@@ -3,50 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Security — Imvula Labs</title>
+    <title>AI Agents — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../css/application.css">
+    <style>
+        .agent-form { display: grid; grid-template-columns: 2fr 2fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+        .agent-form input, .agent-form select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        .agent-form input:focus, .agent-form select:focus { outline: none; border-color: #2563eb; }
+        .agent-form button { padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .agent-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .form-error { color: #991b1b; background: #fef2f2; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+        .form-error.show { display: block; }
+        .member-notice { background: #fef3c7; color: #92400e; padding: 12px 16px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .member-notice.show { display: block; }
+        @media (max-width: 768px) { .agent-form { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
-<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <div class="sidebar-brand">
+            <img src="../assets/logo.svg" alt="Imvula Labs">
+            <span>Imvula<span class="accent">Labs</span></span>
+        </div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
-            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
-            <a href="assessments.html"><span class="icon">◇</span><span>Assessments</span></a>
-            <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
-            <a href="ai-security.html" class="active"><span class="icon">◎</span><span>AI Security</span></a>
+            <a href="reports.html"><span class="icon">▣</span><span>AI Usage</span></a>
+            <a href="ai-security.html" class="active"><span class="icon">◎</span><span>AI Agents</span></a>
+            <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
         </nav>
-        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+        <div class="sidebar-footer" id="userFooter">—</div>
     </aside>
     <main class="main-content">
-        <div class="page-header"><h1>AI Security Assistant</h1><span class="badge medium">DEMO MODE</span></div>
-        <div class="card" style="text-align:center;">
-            <p style="color:var(--muted);margin-bottom:20px;">This is a demonstration of the Imvula AI Security Assistant interface. No real AI analysis is being performed.</p>
-            <div class="assistant" style="max-width:600px;margin:0 auto;">
-                <div class="assistant-header">
-                    <div class="assistant-avatar">AI</div>
-                    <div><strong>Imvula Security Assistant</strong><small>AI analysis engine — DEMO</small></div>
-                    <span class="assistant-status">● DEMO</span>
-                </div>
-                <div class="chat">
-                    <div class="message user-message">Analyze my application's security posture.</div>
-                    <div class="message ai-message">
-                        <strong>Imvula AI</strong>
-                        <p>I've analyzed the current findings. You have 47 total vulnerabilities across 12 assets. One critical finding requires immediate attention: SQL Injection in the login form (CVSS 9.8).</p>
-                        <div class="risk-row"><span>Risk level</span><strong class="medium">MEDIUM</strong></div>
-                        <div class="risk-row"><span>Findings</span><strong>47</strong></div>
-                        <div class="risk-row"><span>Critical</span><strong class="critical">1</strong></div>
-                    </div>
-                </div>
-                <div class="assistant-input"><span>Ask a security question...</span><button>→</button></div>
-            </div>
+        <div class="page-header"><h1>AI Agents</h1><span class="badge medium" id="countBadge">—</span></div>
+
+        <div class="member-notice" id="memberNotice">
+            Only owners and admins can register new agents. You can still see the list below.
+        </div>
+
+        <div class="card" id="createCard">
+            <h3>Register an Agent</h3>
+            <div class="form-error" id="formError"></div>
+            <form class="agent-form" id="agentForm">
+                <input type="text" id="agentName" placeholder="Agent name (e.g. Risk Analyser)" required maxlength="100">
+                <input type="text" id="agentDesc" placeholder="Description (optional)" maxlength="200">
+                <select id="agentKind" required>
+                    <option value="">Kind...</option>
+                    <option value="analyst">Analyst</option>
+                    <option value="planner">Planner</option>
+                    <option value="executor">Executor</option>
+                </select>
+                <button type="submit" id="submitBtn">Register</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Registered Agents</h3>
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Name</th><th>Kind</th><th>Status</th><th>Description</th></tr></thead>
+                <tbody id="agentsBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
+            </table>
         </div>
     </main>
 </div>
-<div class="demo-watermark">DEMO</div>
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
+<script>
+(function () {
+    if (!window.ImvulaAuth.isLoggedIn()) {
+        window.location.href = window.IMVULA.url("pages/login.html");
+        return;
+    }
+
+    document.getElementById("logoutLink").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.ImvulaAuth.logout();
+    });
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+    }
+
+    function loadAgents() {
+        return window.ImvulaAuth.api("/guardian/agents").then(function (agents) {
+            var tbody = document.getElementById("agentsBody");
+            document.getElementById("countBadge").textContent =
+                agents.length + " agent" + (agents.length === 1 ? "" : "s");
+
+            if (agents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No agents registered yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = agents.map(function (a) {
+                return "<tr>" +
+                    "<td>#" + a.id + "</td>" +
+                    "<td>" + esc(a.name) + "</td>" +
+                    "<td>" + esc(a.kind) + "</td>" +
+                    '<td><span class="badge ' + (a.active ? "success" : "medium") + '">' + (a.active ? "Active" : "Inactive") + "</span></td>" +
+                    "<td style='max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'>" + (esc(a.description) || "—") + "</td>" +
+                    "</tr>";
+            }).join("");
+        });
+    }
+
+    var form = document.getElementById("agentForm");
+    var btn = document.getElementById("submitBtn");
+    var errBox = document.getElementById("formError");
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        errBox.classList.remove("show");
+        btn.disabled = true;
+        btn.textContent = "Registering...";
+
+        window.ImvulaAuth.api("/guardian/agents", {
+            method: "POST",
+            body: {
+                name: document.getElementById("agentName").value.trim(),
+                description: document.getElementById("agentDesc").value.trim(),
+                kind: document.getElementById("agentKind").value
+            }
+        }).then(function () {
+            form.reset();
+            btn.disabled = false;
+            btn.textContent = "Register";
+            return loadAgents();
+        }).catch(function (err) {
+            errBox.textContent = err.message || "Failed to register agent";
+            errBox.classList.add("show");
+            btn.disabled = false;
+            btn.textContent = "Register";
+        });
+    });
+
+    window.ImvulaAuth.me().then(function (user) {
+        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
+
+        var isAdmin = user.role === "owner" || user.role === "admin";
+        if (!isAdmin) {
+            document.getElementById("createCard").style.display = "none";
+            document.getElementById("memberNotice").classList.add("show");
+        }
+        return loadAgents();
+    }).catch(function (err) {
+        errBox.textContent = "Error: " + (err.message || "failed to load");
+        errBox.classList.add("show");
+    });
+})();
+</script>
 </body>
 </html>
