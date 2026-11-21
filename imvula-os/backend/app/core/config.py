@@ -11,5 +11,12 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiry_minutes: int = 60
 
+    # ── AI Gateway (Phase 5) ──
+    # "mock"     — deterministic fake AI, no API key, zero cost (default, safe)
+    # "deepseek" — real DeepSeek API, requires DEEPSEEK_API_KEY
+    ai_provider: str = "mock"
+    deepseek_api_key: str = ""
+    deepseek_model: str = "deepseek-chat"
+
 
 settings = Settings()
