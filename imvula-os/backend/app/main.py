@@ -6,20 +6,16 @@ from app.core.config import settings
 from app.core.database import Base, engine
 import app.models  # noqa: F401 — register all models before create_all
 
-Base.metadata.create_all(bind=engine)
+# NOTE: create_all is used for local SQLite development only.
+# In production, Alembic migrations (Step 2) manage the schema.
+if settings.environment != "production":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.app_name)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-        "http://192.168.192.128:8080",
-        "http://localhost:8000",
-        "http://localhost:8501",
-        "https://zithaewarty-11.github.io",
-    ],
+    allow_origins=settings.origins_list(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
