@@ -30,5 +30,6 @@ services:
 databases:
   - name: imvula-os-db
     plan: free
+    region: frankfurt
     databaseName: imvula
     user: imvula
