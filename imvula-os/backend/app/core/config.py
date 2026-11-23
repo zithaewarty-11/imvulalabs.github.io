@@ -56,6 +56,14 @@ class Settings(BaseSettings):
                 )
         return self
 
+    @property
+    def sqlalchemy_url(self) -> str:
+        """Return a SQLAlchemy-compatible URL (psycopg3 for PostgreSQL)."""
+        url = self.database_url
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", "postgresql+psycopg://", 1)
+        return url
+
     def origins_list(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
 
