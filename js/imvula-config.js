@@ -1,5 +1,5 @@
 (function () {
-  var PROD_API_BASE_URL = "https://imvula-os-api.example.com";
+  var PROD_API_BASE_URL = "https://imvula-os-api-xs76.onrender.com";
   var host = window.location.hostname;
 
   var isLocal =
