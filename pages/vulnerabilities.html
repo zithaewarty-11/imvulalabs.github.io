@@ -19,6 +19,26 @@
         .filters { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
         .filters select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
         @media (max-width: 768px) { .risk-form { grid-template-columns: 1fr; } }
+    
+        @media print {
+            .sidebar, .risk-form, .no-assets, .filters, .page-header, .form-error { display: none !important; }
+            .app-layout { display: block !important; }
+            .main-content { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+            body { background: white !important; font-size: 12px; }
+            .data-table th, .data-table td { padding: 8px !important; }
+            h1 { font-size: 20px !important; margin-bottom: 20px !important; }
+            /* Add a professional header for the printout */
+            .main-content::before {
+                content: "Imvula Labs - Security Risk Report";
+                display: block;
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -63,8 +83,9 @@
         </div>
 
         <div class="card">
-            <div class="filters">
-                <label for="severityFilter" style="font-size:13px;color:var(--muted);">Filter:</label>
+            <div class="filters" style="justify-content: space-between;">
+                <div>
+                    <label for="severityFilter" style="font-size:13px;color:var(--muted);">Filter:</label>
                 <select id="severityFilter">
                     <option value="">All severities</option>
                     <option value="critical">Critical</option>
@@ -72,6 +93,8 @@
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                 </select>
+                </div>
+                <button onclick="window.print()" class="btn primary" style="padding: 6px 12px; font-size: 13px; background: #111827; border: none; border-radius: 6px; color: white; cursor: pointer;">🖨️ Export Report</button>
             </div>
             <table class="data-table">
                 <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Asset</th></tr></thead>
