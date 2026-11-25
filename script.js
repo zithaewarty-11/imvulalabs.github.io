@@ -112,6 +112,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showReport(url) {
         reportUrl.textContent = url;
+        
+        // Generate Date and Ref Number
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' });
+        const refStr = 'IMV-' + today.getFullYear() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        
+        if (document.getElementById('reportDate')) document.getElementById('reportDate').textContent = dateStr;
+        if (document.getElementById('reportRef')) document.getElementById('reportRef').textContent = refStr;
 
         // Deterministic pseudo-score based on URL length (simulation only)
         const score = 60 + (url.length % 35); // range 60-95
@@ -189,6 +197,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     runBtn.addEventListener('click', runAssessment);
     resetBtn.addEventListener('click', resetDemo);
+    
+    const printBtn = document.getElementById('printReportBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            window.print();
+        });
+    }
 
     // Allow Enter key to trigger assessment
     urlInput.addEventListener('keypress', function (e) {

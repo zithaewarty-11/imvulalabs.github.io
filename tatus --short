@@ -1,0 +1,74 @@
+[1mdiff --git a/pages/dashboard.html b/pages/dashboard.html[m
+[1mindex 6265385..57272d6 100644[m
+[1m--- a/pages/dashboard.html[m
+[1m+++ b/pages/dashboard.html[m
+[36m@@ -1,7 +1,7 @@[m
+ <!DOCTYPE html>[m
+ <html lang="en">[m
+ <head>[m
+[31m-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com; img-src 'self' data:;">[m
+[32m+[m[32m    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com http://localhost:8000 http://127.0.0.1:8000; img-src 'self' data:;">[m
+     <meta charset="UTF-8">[m
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">[m
+     <title>Dashboard — Imvula Labs</title>[m
+[36m@@ -62,73 +62,6 @@[m
+ </div>[m
+ <script src="../js/imvula-config.js"></script>[m
+ <script src="../js/imvula-auth.js"></script>[m
+[31m-<script>[m
+[31m-(function () {[m
+[31m-    if (!window.ImvulaAuth.isLoggedIn()) {[m
+[31m-        window.location.href = window.IMVULA.url("pages/login.html");[m
+[31m-        return;[m
+[31m-    }[m
+[31m-[m
+[31m-    document.getElementById("logoutLink").addEventListener("click", function (e) {[m
+[31m-        e.preventDefault();[m
+[31m-        window.ImvulaAuth.logout();[m
+[31m-    });[m
+[31m-[m
+[31m-    function esc(s) {[m
+[31m-        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {[m
+[31m-            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];[m
+[31m-        });[m
+[31m-    }[m
+[31m-[m
+[31m-    var banner = document.getElementById("statusBanner");[m
+[31m-[m
+[31m-    window.ImvulaAuth.me().then(function (user) {[m
+[31m-        banner.textContent = "Signed in as " + user.email + " · Organisation #" + user.org_id + " · Role: " + user.role;[m
+[31m-        document.getElementById("orgBadge").textContent = "Role: " + user.role;[m
+[31m-        document.getElementById("userFooter").textContent = user.email + " · " + user.role;[m
+[31m-[m
+[31m-        return Promise.all([[m
+[31m-            window.ImvulaAuth.api("/quantum/assets"),[m
+[31m-            window.ImvulaAuth.api("/quantum/risks")[m
+[31m-        ]);[m
+[31m-    }).then(function (results) {[m
+[31m-        var assets = results[0] || [];[m
+[31m-        var risks = results[1] || [];[m
+[31m-[m
+[31m-        var c = { critical: 0, high: 0, medium: 0, low: 0 };[m
+[31m-        risks.forEach(function (r) {[m
+[31m-            if (c[r.severity] !== undefined) c[r.severity]++;[m
+[31m-        });[m
+[31m-        document.getElementById("countCritical").textContent = c.critical;[m
+[31m-        document.getElementById("countHigh").textContent = c.high;[m
+[31m-        document.getElementById("countMedium").textContent = c.medium;[m
+[31m-        document.getElementById("countLow").textContent = c.low;[m
+[31m-[m
+[31m-        document.getElementById("assetCount").textContent = assets.length;[m
+[31m-        document.getElementById("assetSummary").textContent =[m
+[31m-            assets.length === 0[m
+[31m-                ? "No assets yet. Add one on the Assets page."[m
+[31m-                : assets.length + " asset" + (assets.length === 1 ? "" : "s") + " tracked.";[m
+[31m-[m
+[31m-        var tbody = document.getElementById("riskTableBody");[m
+[31m-        if (risks.length === 0) {[m
+[31m-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">No risks yet. Create one on the Risks page.</td></tr>';[m
+[31m-        } else {[m
+[31m-            tbody.innerHTML = risks.slice(0, 10).map(function (r) {[m
+[31m-                return "<tr>" +[m
+[31m-                    "<td>#" + r.id + "</td>" +[m
+[31m-                    "<td>" + esc(r.title) + "</td>" +[m
+[31m-                    '<td><span class="badge ' + esc(r.severity) + '">' + esc(r.

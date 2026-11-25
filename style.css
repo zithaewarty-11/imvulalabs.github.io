@@ -735,3 +735,133 @@ footer {
 .severity-badge.high     { background: #f97316; color: #fff; }
 .severity-badge.medium   { background: #eab308; color: #0a0e17; }
 .severity-badge.low      { background: #00ff9d; color: #0a0e17; }
+/* ── AI Chat Assistant Styles ── */
+#chatInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 10px;
+    outline: none;
+    font-size: 14px;
+}
+#chatInput::placeholder {
+    color: #64748b;
+}
+.assistant-input button {
+    background: transparent;
+    border: none;
+    color: #00ff9d;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 15px;
+    transition: transform 0.2s;
+}
+.assistant-input button:hover {
+    transform: scale(1.1);
+}
+.user-message {
+    background: #1e293b !important;
+    color: #fff !important;
+    align-self: flex-end;
+    border-left: none !important;
+    border-right: 3px solid #00ff9d !important;
+    margin-left: 20px;
+}
+.ai-message {
+    align-self: flex-start;
+    margin-right: 20px;
+    border-left: 3px solid #334155;
+}
+.chat {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+}
+
+/* ── Printable Report Styles (Stage 3) ── */
+@media print {
+    /* Hide everything except the report */
+    .navbar, .hero, #assessment-demo .section-heading, .demo-input-group, 
+    #progressContainer, #resetDemoBtn, #printReportBtn, footer, .demo-watermark,
+    #services, #ai-security, #process, #about, #contact { 
+        display: none !important; 
+    }
+    
+    body { 
+        background: #ffffff !important; 
+        color: #000000 !important; 
+        font-size: 12pt; 
+    }
+    
+    #assessment-demo { 
+        padding: 0 !important; 
+        border: none !important; 
+        background: transparent !important;
+    }
+    
+    #reportContainer { 
+        display: block !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+    }
+    
+    #reportContainer > div { 
+        background: transparent !important; 
+        border: 1px solid #000 !important; 
+        box-shadow: none !important; 
+        padding: 20px !important;
+    }
+    
+    /* Force text to be black/dark grey for printing */
+    #reportContainer h3, #reportContainer h4, #reportContainer strong, 
+    #reportContainer p, #reportContainer span, #reportContainer div { 
+        color: #000 !important; 
+    }
+    
+    #reportScore { color: #000 !important; font-size: 36pt !important; }
+    #reportRiskLevel { color: #000 !important; font-size: 24pt !important; }
+    
+    /* Ensure findings print cleanly */
+    .finding-item { 
+        border: 1px solid #ccc !important; 
+        background: #f9f9f9 !important; 
+        page-break-inside: avoid; 
+    }
+    
+    .severity-badge {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        background: #e0e0e0 !important;
+    }
+    
+    /* Add a header for the PDF */
+    #reportContainer::before {
+        content: "IMVULA LABS — SECURITY ASSESSMENT REPORT";
+        display: block;
+        font-size: 18pt;
+        font-weight: bold;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+        text-align: center;
+    }
+}
+
+/* ── Stage 4: Contact Form Styles ── */
+#serviceRequestForm input:focus, 
+#serviceRequestForm select:focus, 
+#serviceRequestForm textarea:focus {
+    outline: none;
+    border-color: #00ff9d !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+}
+
+@media (max-width: 600px) {
+    #serviceRequestForm > div:first-child {
+        grid-template-columns: 1fr !important;
+    }
+}

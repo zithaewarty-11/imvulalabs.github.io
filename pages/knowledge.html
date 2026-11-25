@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Centre — Imvula Labs</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .knowledge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .knowledge-card { background: #111827; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; transition: 0.3s; }
+        .knowledge-card:hover { border-color: #334155; }
+        .knowledge-card summary { padding: 20px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #fff; font-size: 18px; }
+        .knowledge-card summary::-webkit-details-marker { display: none; }
+        .knowledge-card summary::after { content: '+'; color: #00ff9d; font-size: 24px; font-weight: 400; }
+        .knowledge-card[open] summary::after { content: '−'; }
+        .knowledge-card[open] summary { border-bottom: 1px solid #1e293b; }
+        .knowledge-content { padding: 20px; color: #94a3b8; font-size: 14px; line-height: 1.7; }
+        .knowledge-content h4 { color: #e2e8f0; margin: 15px 0 5px 0; font-size: 15px; }
+        .knowledge-content ul { padding-left: 20px; margin: 10px 0; }
+        .knowledge-content li { margin-bottom: 8px; }
+        .knowledge-header { text-align: center; padding: 60px 20px 20px; }
+        .knowledge-header h1 { color: #fff; font-size: 36px; margin-bottom: 10px; }
+        .knowledge-header p { color: #94a3b8; font-size: 16px; max-width: 600px; margin: 0 auto; }
+        .back-link { display: inline-block; margin: 20px auto; color: #00ff9d; text-decoration: none; font-weight: 600; font-size: 14px; }
+    </style>
+</head>
+<body>
+<header class="navbar">
+    <a href="../index.html" class="brand">
+        <img src="../assets/logo.svg" alt="Imvula Labs logo">
+        <span>Imvula<span class="accent">Labs</span></span>
+    </a>
+    <nav id="navMenu">
+        <a href="../index.html#platform">Platform</a>
+        <a href="../index.html#services">Services</a>
+        <a href="knowledge.html" style="color: #00ff9d;">Knowledge Centre</a>
+        <a href="../index.html#contact">Contact</a>
+        <a href="login.html">Sign In</a>
+    </nav>
+</header>
+
+<main>
+    <div class="knowledge-header">
+        <span class="eyebrow" style="color: #00ff9d; font-weight: 700; letter-spacing: 1px; font-size: 12px;">CYBERSECURITY EDUCATION</span>
+        <h1>Knowledge Centre</h1>
+        <p>Understand the threats, learn the best practices, and build more secure software. Click on any topic to expand it.</p>
+    </div>
+
+    <div class="knowledge-grid">
+        <!-- OWASP Top 10 -->
+        <details class="knowledge-card">
+            <summary>OWASP Top 10</summary>
+            <div class="knowledge-content">
+                <p>The OWASP Top 10 is a standard awareness document for developers and web application security. It represents a broad consensus about the most critical security risks to web applications.</p>
+                <h4>Key Risks Include:</h4>
+                <ul>
+                    <li><strong>Broken Access Control:</strong> Users acting outside of their intended permissions (e.g., viewing another user's data).</li>
+                    <li><strong>Cryptographic Failures:</strong> Failure to protect sensitive data (like passwords or credit cards) in transit or at rest.</li>
+                    <li><strong>Injection:</strong> Untrusted data is sent to an interpreter (e.g., SQL, OS, or LDAP), tricking it into executing unintended commands.</li>
+                    <li><strong>Insecure Design:</strong> Missing or ineffective control design, such as lacking business logic limits.</li>
+                </ul>
+            </div>
+        </details>
+
+        <!-- API Security -->
+        <details class="knowledge-card">
+            <summary>API Security</summary>
+            <div class="knowledge-content">
+                <p>APIs are the backbone of modern applications, but they are frequently exposed to the internet and contain sensitive data. Securing them is critical.</p>
+                <h4>Common API Vulnerabilities:</h4>
+                <ul>
+                    <li><strong>BOLA (Broken Object Level Authorization):</strong> Attackers manipulate IDs sent in the request to access data they shouldn't see (e.g., changing `/user/123` to `/user/124`).</li>
+                    <li><strong>Broken Authentication:</strong> Weak authentication mechanisms allow attackers to compromise tokens or passwords.</li>
+                    <li><strong>Excessive Data Exposure:</strong> APIs return full data objects to the client instead of filtering out sensitive fields.</li>
+                </ul>
+            </div>
+        </details>
+
+        <!-- Web App Security -->
+        <details class="knowledge-card">
+            <summary>Web Application Security</summary>
+            <div class="knowledge-content">
+                <p>Web applications are the front door to your business. If they are compromised, attackers can steal data, deface your site, or use it to attack your customers.</p>
+                <h4>Best Practices:</h4>
+                <ul>
+                    <li>Always validate and sanitize user input on both the client and the server side.</li>
+                    <li>Use HTTPS everywhere to encrypt data in transit.</li>
+                    <li>Implement strict Content Security Policies (CSP) to mitigate XSS attacks.</li>
+                    <li>Regularly patch and update third-party libraries and frameworks.</li>
+                </ul>
+            </div>
+        </details>
+
+        <!-- Vulnerability Assessments -->
+        <details class="knowledge-card">
+            <summary>Vulnerability Assessments</summary>
+            <div class="knowledge-content">
+                <p>A Vulnerability Assessment is a systematic review of security weaknesses in an information system. It evaluates if the system is susceptible to any known vulnerabilities, assigns severity levels, and recommends remediation.</p>
+                <p>Unlike a Penetration Test, a Vulnerability Assessment is usually automated and focuses on breadth (finding as many known flaws as possible) rather than depth (exploiting them to chain attacks).</p>
+            </div>
+        </details>
+
+        <!-- Secure Coding -->
+        <details class="knowledge-card">
+            <summary>Secure Coding Practices</summary>
+            <div class="knowledge-content">
+                <p>Building security into the software development lifecycle (SDLC) is much cheaper and safer than fixing it after deployment.</p>
+                <h4>Developer Golden Rules:</h4>
+                <ul>
+                    <li><strong>Parameterized Queries:</strong> Always use prepared statements to prevent SQL Injection.</li>
+                    <li><strong>Escape Output:</strong> Encode data before rendering it to the browser to prevent XSS.</li>
+                    <li><strong>Least Privilege:</strong> Ensure the application runs with the minimum permissions required to do its job.</li>
+                </ul>
+            </div>
+        </details>
+        
+        <!-- Cybersecurity Awareness -->
+        <details class="knowledge-card">
+            <summary>Cybersecurity Awareness</summary>
+            <div class="knowledge-content">
+                <p>Technology alone cannot stop all attacks; human error remains a leading cause of breaches.</p>
+                <h4>Stay Vigilant:</h4>
+                <ul>
+                    <li><strong>Phishing:</strong> Never click suspicious links or download unexpected attachments.</li>
+                    <li><strong>Password Hygiene:</strong> Use a password manager, never reuse passwords, and enable Multi-Factor Authentication (MFA) everywhere.</li>
+                    <li><strong>Social Engineering:</strong> Be cautious of people calling or emailing asking for sensitive information, even if they claim to be IT.</li>
+                </ul>
+            </div>
+        </details>
+    </div>
+    
+    <div style="text-align: center; padding-bottom: 60px;">
+        <a href="../index.html" class="back-link">← Back to Home</a>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-brand"><img src="../assets/logo.svg" alt="Imvula Labs" style="height:24px;"><strong>Imvula Labs</strong></div>
+    <div style="margin: 15px 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+        <a href="../pages/methodology.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Methodology</a>
+        <a href="../pages/disclosure.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Responsible Disclosure</a>
+        <a href="../pages/terms.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Terms of Service</a>
+        <a href="../pages/privacy.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Privacy Policy</a>
+    </div>
+    <p>© 2026 Imvula Labs. Ethical Cybersecurity. All rights reserved.</p>
+</footer>
+</body>
+</html>

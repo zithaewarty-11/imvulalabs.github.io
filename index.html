@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imvula Labs | Ethical Penetration Testing</title>
+    
+    <meta property="og:title" content="Imvula Labs | Ethical Penetration Testing">
+    <meta property="og:description" content="Understand the risk. Prioritise the fix. Imvula Labs delivers ethical penetration testing and AI-assisted security intelligence.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zithaewarty-11.github.io/imvulalabs.github.io/">
+    <meta property="og:image" content="https://zithaewarty-11.github.io/imvulalabs.github.io/assets/logo.svg">
     <meta name="description" content="Imvula Labs delivers ethical penetration testing, vulnerability assessment and cybersecurity solutions. We break your web apps before criminals do.">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,6 +23,7 @@
     <nav id="navMenu">
         <a href="#services">Services</a>
         <a href="#ai-security">AI Security</a>
+        <a href="pages/knowledge.html">Knowledge Centre</a>
         <a href="#process">Process</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
@@ -85,7 +92,9 @@
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                     <div>
                         <h3 style="color: #fff; margin: 0 0 8px 0;">Assessment Report</h3>
-                        <p style="color: #94a3b8; margin: 0;">Target: <span id="reportUrl" style="color: #00ff9d;"></span></p>
+                        <p style="color: #94a3b8; margin: 0 0 4px 0;">Target: <span id="reportUrl" style="color: #00ff9d;"></span></p>
+                        <p style="color: #94a3b8; margin: 0 0 4px 0;">Date: <span id="reportDate"></span></p>
+                        <p style="color: #94a3b8; margin: 0;">Ref: <span id="reportRef"></span></p>
                     </div>
                     <span id="reportStatus" style="background: #00ff9d; color: #0a0e17; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 12px;">COMPLETED</span>
                 </div>
@@ -109,7 +118,10 @@
                     <p style="color: #c7d2fe; margin: 0; font-size: 14px;"><strong>⚠ Simulation Only:</strong> This is an illustrative demonstration. No real security scan or vulnerability testing has been performed.</p>
                 </div>
             </div>
-            <button id="resetDemoBtn" style="background: transparent; color: #94a3b8; border: 1px solid #334155; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">Run Another Demo</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="printReportBtn" class="btn primary" style="padding: 10px 20px; background: #00ff9d; color: #0a0e17; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">🖨️ Download Report</button>
+                <button id="resetDemoBtn" style="background: transparent; color: #94a3b8; border: 1px solid #334155; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">Run Another Demo</button>
+            </div>
         </div>
     </div>
 </section>
@@ -152,7 +164,7 @@
     <div class="ai-copy">
         <span class="eyebrow">AI SECURITY INTELLIGENCE</span>
         <h2>Human expertise. <span>Machine intelligence.</span></h2>
-        <p>Our future AI security layer helps transform complex security information into clear, actionable intelligence.</p>
+        <p>Our platform helps transform complex security information into clear, actionable intelligence.</p>
         <ul class="feature-list">
             <li><span>✓</span> Natural-language security analysis</li>
             <li><span>✓</span> AI-assisted vulnerability explanations</li>
@@ -163,20 +175,19 @@
     <div class="assistant">
         <div class="assistant-header">
             <div class="assistant-avatar">AI</div>
-            <div><strong>Imvula Security Assistant</strong><small>AI analysis engine — DEMO</small></div>
-            <span class="assistant-status">● DEMO</span>
+            <div><strong>Imvula Security Assistant</strong><small>Local Knowledge Base</small></div>
+            <span class="assistant-status" style="color: #00ff9d;">● ONLINE</span>
         </div>
-        <div class="chat">
-            <div class="message user-message">Analyze my application's security posture.</div>
+        <div class="chat" id="chatWindow">
             <div class="message ai-message">
                 <strong>Imvula AI</strong>
-                <p>I can help organize security findings, explain vulnerabilities and prioritize remediation.</p>
-                <div class="risk-row"><span>Risk level</span><strong class="medium">MEDIUM</strong></div>
-                <div class="risk-row"><span>Findings</span><strong>12</strong></div>
-                <div class="risk-row"><span>Critical</span><strong class="critical">1</strong></div>
+                <p>Hello! I am a local rule-based assistant. Ask me about Web Security, API Security, OWASP Top 10, or our services.</p>
             </div>
         </div>
-        <div class="assistant-input"><span>Ask a security question...</span><button>→</button></div>
+        <div class="assistant-input">
+            <input type="text" id="chatInput" placeholder="Ask a security question..." autocomplete="off">
+            <button id="chatSendBtn">→</button>
+        </div>
     </div>
 </section>
 
@@ -202,24 +213,69 @@
     </div>
 </section>
 
-<section id="contact" class="contact-section">
-    <div>
-        <span class="eyebrow">START A CONVERSATION</span>
-        <h2>Ready to test your security?</h2>
-        <p>Tell us about your application or security requirements and start a conversation with Imvula Labs.</p>
-        <a href="mailto:info@imvulalabs.co.za" class="btn primary">Contact Imvula Labs →</a>
+<section id="contact" class="section" style="padding: 60px 20px; background: #0f172a;">
+    <div class="section-heading" style="text-align: center; margin-bottom: 40px;">
+        <span class="eyebrow" style="color: #00ff9d;">START A CONVERSATION</span>
+        <h2 style="color: #fff; font-size: 32px; margin: 10px 0;">Request a Security Assessment</h2>
+        <p style="color: #94a3b8; font-size: 16px;">Tell us about your application and we will help you understand the risk.</p>
+    </div>
+    
+    <div class="contact-form-container" style="max-width: 600px; margin: 0 auto; background: #1e293b; padding: 30px; border-radius: 12px; border: 1px solid #334155;">
+        <div id="formError" style="display: none; color: #ef4444; background: #450a0a; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; border: 1px solid #ef4444;"></div>
+        <div id="formSuccess" style="display: none; color: #00ff9d; background: #022c22; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; border: 1px solid #00ff9d;"></div>
+        
+        <form id="serviceRequestForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label for="reqName" style="display:block; color:#94a3b8; font-size:12px; margin-bottom:5px; font-weight:600;">Full Name *</label>
+                    <input type="text" id="reqName" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#fff;">
+                </div>
+                <div>
+                    <label for="reqCompany" style="display:block; color:#94a3b8; font-size:12px; margin-bottom:5px; font-weight:600;">Company Name</label>
+                    <input type="text" id="reqCompany" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#fff;">
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="reqEmail" style="display:block; color:#94a3b8; font-size:12px; margin-bottom:5px; font-weight:600;">Work Email *</label>
+                <input type="email" id="reqEmail" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#fff;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="reqService" style="display:block; color:#94a3b8; font-size:12px; margin-bottom:5px; font-weight:600;">Service Requested *</label>
+                <select id="reqService" required style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#fff;">
+                    <option value="">Select a service...</option>
+                    <option value="Web Application Security Testing">Web Application Security Testing</option>
+                    <option value="API Security Testing">API Security Testing</option>
+                    <option value="Vulnerability Assessment">Vulnerability Assessment</option>
+                    <option value="Secure Code Review">Secure Code Review</option>
+                    <option value="General Security Consultation">General Security Consultation</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="reqDesc" style="display:block; color:#94a3b8; font-size:12px; margin-bottom:5px; font-weight:600;">Project Description *</label>
+                <textarea id="reqDesc" required rows="4" placeholder="Tell us about the application, technologies used, and your primary security concerns..." style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:6px; color:#fff; resize:vertical;"></textarea>
+            </div>
+            
+            <button type="submit" class="btn primary" style="width: 100%; padding: 14px; background: #00ff9d; color: #0a0e17; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">Generate Email Draft →</button>
+        </form>
     </div>
 </section>
 </main>
 <footer>
-    <div class="footer-brand"><img src="assets/logo.svg" alt="Imvula Labs"><strong>Imvula Labs</strong></div>
-    <div style="margin-bottom: 10px;">
-        <a href="pages/terms.html" style="color: #94a3b8; text-decoration: none; margin: 0 10px; font-size: 14px;">Terms of Service</a>
-        <a href="pages/privacy.html" style="color: #94a3b8; text-decoration: none; margin: 0 10px; font-size: 14px;">Privacy Policy</a>
+    <div class="footer-brand"><img src="../assets/logo.svg" alt="Imvula Labs" style="height:24px;"><strong>Imvula Labs</strong></div>
+    <div style="margin: 15px 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+        <a href="pages/methodology.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Methodology</a>
+        <a href="pages/disclosure.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Responsible Disclosure</a>
+        <a href="pages/terms.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Terms of Service</a>
+        <a href="pages/privacy.html" style="color: #94a3b8; text-decoration: none; font-size: 13px;">Privacy Policy</a>
     </div>
-    <p>© 2026 Imvula Labs. Ethical Cybersecurity. All demo data is simulated.</p>
+    <p>© 2026 Imvula Labs. Ethical Cybersecurity. All rights reserved.</p>
 </footer>
 <div class="demo-watermark">DEMO</div>
 <script src="script.js"></script>
+    <script src="js/ai-assistant.js"></script>
+    <script src="js/contact-form.js"></script>
 </body>
 </html>

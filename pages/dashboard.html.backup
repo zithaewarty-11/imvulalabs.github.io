@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com; img-src 'self' data:;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Imvula Labs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/application.css">
+</head>
+<body>
+<div id="statusBanner" style="background:#eef2ff;color:#3730a3;padding:10px 16px;font-size:13px;text-align:center;font-weight:600;">Loading your workspace...</div>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="../assets/logo.svg" alt="Imvula Labs">
+            <span>Imvula<span class="accent">Labs</span></span>
+        </div>
+        <nav>
+            <a href="dashboard.html" class="active"><span class="icon">◈</span><span>Dashboard</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
+            <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
+            <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
+            <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
+        </nav>
+        <div class="sidebar-footer" id="userFooter">—</div>
+    </aside>
+    <main class="main-content">
+        <div class="page-header"><h1>Security Dashboard</h1><span class="badge" id="orgBadge">Loading...</span></div>
+        <div class="stat-grid">
+            <div class="stat-card danger"><div class="stat-label">CRITICAL</div><div class="stat-value" id="countCritical">—</div><div class="stat-sub">Requires immediate action</div></div>
+            <div class="stat-card warning"><div class="stat-label">HIGH</div><div class="stat-value" id="countHigh">—</div><div class="stat-sub">Urgent remediation needed</div></div>
+            <div class="stat-card info"><div class="stat-label">MEDIUM</div><div class="stat-value" id="countMedium">—</div><div class="stat-sub">Address within 30 days</div></div>
+            <div class="stat-card success"><div class="stat-label">LOW</div><div class="stat-value" id="countLow">—</div><div class="stat-sub">Address within 90 days</div></div>
+        </div>
+        <div class="two-col">
+            <div class="card" style="text-align:center;">
+                <h3>Assets Tracked</h3>
+                <div class="score-ring-large"><span id="assetCount">—</span></div>
+                <p style="color:var(--muted);font-size:13px;" id="assetSummary">Loading...</p>
+            </div>
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div class="quick-actions">
+                    <a href="vulnerabilities.html" class="quick-action"><span class="icon">⌁</span><span>View Risks</span></a>
+                    <a href="assets.html" class="quick-action"><span class="icon">⌬</span><span>Manage Assets</span></a>
+                    <a href="ai-security.html" class="quick-action"><span class="icon">◎</span><span>AI Agents</span></a>
+                    <a href="reports.html" class="quick-action"><span class="icon">▣</span><span>AI Usage</span></a>
+                    <a href="../index.html" class="quick-action"><span class="icon">↗</span><span>Public Site</span></a>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Open Risks</h3>
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Risk</th><th>Severity</th><th>Status</th></tr></thead>
+                <tbody id="riskTableBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
+<script>
+(function () {
+    if (!window.ImvulaAuth.isLoggedIn()) {
+        window.location.href = window.IMVULA.url("pages/login.html");
+        return;
+    }
+
+    document.getElementById("logoutLink").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.ImvulaAuth.logout();
+    });
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+    }
+
+    var banner = document.getElementById("statusBanner");
+
+    window.ImvulaAuth.me().then(function (user) {
+        banner.textContent = "Signed in as " + user.email + " · Organisation #" + user.org_id + " · Role: " + user.role;
+        document.getElementById("orgBadge").textContent = "Role: " + user.role;
+        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
+
+        return Promise.all([
+            window.ImvulaAuth.api("/quantum/assets"),
+            window.ImvulaAuth.api("/quantum/risks")
+        ]);
+    }).then(function (results) {
+        var assets = results[0] || [];
+        var risks = results[1] || [];
+
+        var c = { critical: 0, high: 0, medium: 0, low: 0 };
+        risks.forEach(function (r) {
+            if (c[r.severity] !== undefined) c[r.severity]++;
+        });
+        document.getElementById("countCritical").textContent = c.critical;
+        document.getElementById("countHigh").textContent = c.high;
+        document.getElementById("countMedium").textContent = c.medium;
+        document.getElementById("countLow").textContent = c.low;
+
+        document.getElementById("assetCount").textContent = assets.length;
+        document.getElementById("assetSummary").textContent =
+            assets.length === 0
+                ? "No assets yet. Add one on the Assets page."
+                : assets.length + " asset" + (assets.length === 1 ? "" : "s") + " tracked.";
+
+        var tbody = document.getElementById("riskTableBody");
+        if (risks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">No risks yet. Create one on the Risks page.</td></tr>';
+        } else {
+            tbody.innerHTML = risks.slice(0, 10).map(function (r) {
+                return "<tr>" +
+                    "<td>#" + r.id + "</td>" +
+                    "<td>" + esc(r.title) + "</td>" +
+                    '<td><span class="badge ' + esc(r.severity) + '">' + esc(r.severity) + '</span></td>' +
+                    '<td><span class="badge ' + esc(r.status).replace(/[\s_]/g, "") + '">' + esc(r.status) + '</span></td>' +
+                    "</tr>";
+            }).join("");
+        }
+    }).catch(function (err) {
+        banner.textContent = "Error: " + (err.message || "failed to load data");
+        banner.style.background = "#fef2f2";
+        banner.style.color = "#991b1b";
+    });
+})();
+</script>
+</body>
+</html>
