@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com http://localhost:8000 http://127.0.0.1:8000; img-src 'self' data:;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — Imvula Labs</title>
@@ -62,73 +62,6 @@
 </div>
 <script src="../js/imvula-config.js"></script>
 <script src="../js/imvula-auth.js"></script>
-<script>
-(function () {
-    if (!window.ImvulaAuth.isLoggedIn()) {
-        window.location.href = window.IMVULA.url("pages/login.html");
-        return;
-    }
-
-    document.getElementById("logoutLink").addEventListener("click", function (e) {
-        e.preventDefault();
-        window.ImvulaAuth.logout();
-    });
-
-    function esc(s) {
-        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-        });
-    }
-
-    var banner = document.getElementById("statusBanner");
-
-    window.ImvulaAuth.me().then(function (user) {
-        banner.textContent = "Signed in as " + user.email + " · Organisation #" + user.org_id + " · Role: " + user.role;
-        document.getElementById("orgBadge").textContent = "Role: " + user.role;
-        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
-
-        return Promise.all([
-            window.ImvulaAuth.api("/quantum/assets"),
-            window.ImvulaAuth.api("/quantum/risks")
-        ]);
-    }).then(function (results) {
-        var assets = results[0] || [];
-        var risks = results[1] || [];
-
-        var c = { critical: 0, high: 0, medium: 0, low: 0 };
-        risks.forEach(function (r) {
-            if (c[r.severity] !== undefined) c[r.severity]++;
-        });
-        document.getElementById("countCritical").textContent = c.critical;
-        document.getElementById("countHigh").textContent = c.high;
-        document.getElementById("countMedium").textContent = c.medium;
-        document.getElementById("countLow").textContent = c.low;
-
-        document.getElementById("assetCount").textContent = assets.length;
-        document.getElementById("assetSummary").textContent =
-            assets.length === 0
-                ? "No assets yet. Add one on the Assets page."
-                : assets.length + " asset" + (assets.length === 1 ? "" : "s") + " tracked.";
-
-        var tbody = document.getElementById("riskTableBody");
-        if (risks.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">No risks yet. Create one on the Risks page.</td></tr>';
-        } else {
-            tbody.innerHTML = risks.slice(0, 10).map(function (r) {
-                return "<tr>" +
-                    "<td>#" + r.id + "</td>" +
-                    "<td>" + esc(r.title) + "</td>" +
-                    '<td><span class="badge ' + esc(r.severity) + '">' + esc(r.severity) + '</span></td>' +
-                    '<td><span class="badge ' + esc(r.status).replace(/[\s_]/g, "") + '">' + esc(r.status) + '</span></td>' +
-                    "</tr>";
-            }).join("");
-        }
-    }).catch(function (err) {
-        banner.textContent = "Error: " + (err.message || "failed to load data");
-        banner.style.background = "#fef2f2";
-        banner.style.color = "#991b1b";
-    });
-})();
-</script>
+<script src="../js/dashboard.js"></script>
 </body>
 </html>
