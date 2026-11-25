@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Check Python backend dependencies
+  - package-ecosystem: "pip"
+    directory: "/imvula-os/backend"
+    schedule:
+      interval: "weekly"
+  # Check GitHub Actions (if you add them later)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
