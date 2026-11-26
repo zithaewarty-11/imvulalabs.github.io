@@ -1,4 +1,5 @@
 from app.models.ai_usage import AIUsage
+from app.models.assessment import Assessment, AssessmentFinding
 from app.models.audit import AuditEvent
 from app.models.automation import Task
 from app.models.guardian import Agent, AgentRun
@@ -15,5 +16,7 @@ __all__ = [
     "Agent",
     "AgentRun",
     "AIUsage",
+    "Assessment",
+    "AssessmentFinding",
     "AuditEvent",
 ]

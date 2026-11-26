@@ -1,50 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com; img-src 'self' data:;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessments — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../css/application.css">
+    <style>
+        .assessment-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .assessment-card { background: #111827; border: 1px solid #1e293b; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s; }
+        .assessment-card:hover { border-color: #00ff9d; transform: translateY(-2px); }
+        .assessment-card h4 { margin: 0 0 10px 0; color: #fff; font-size: 18px; }
+        .assessment-card p { margin: 0 0 8px 0; color: #94a3b8; font-size: 13px; }
+        .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge.pending { background: #eab308; color: #0a0e17; }
+        .badge.in_progress { background: #3b82f6; color: #fff; }
+        .badge.completed { background: #00ff9d; color: #0a0e17; }
+        .badge.archived { background: #64748b; color: #fff; }
+        
+        .form-container { display: none; background: #111827; border: 1px solid #1e293b; border-radius: 10px; padding: 24px; margin-top: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; font-size: 14px; box-sizing: border-box; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #00ff9d; }
+    </style>
 </head>
 <body>
-<div class="demo-banner">⚠ DEMO MODE — All data is simulated for demonstration purposes only.</div>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
+        <div class="sidebar-brand">
+            <img src="../assets/logo.svg" alt="Imvula Labs">
+            <span>Imvula<span class="accent">Labs</span></span>
+        </div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
-            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
+            <a href="assessments.html" class="active"><span class="icon">📋</span><span>Assessments</span></a>
             <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
-            <a href="assessments.html" class="active"><span class="icon">◇</span><span>Assessments</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
-            <a href="ai-security.html"><span class="icon">◎</span><span>AI Security</span></a>
+            <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
+            <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
         </nav>
-        <div class="sidebar-footer">Imvula Labs · v3.0 · Demo</div>
+        <div class="sidebar-footer" id="userFooter">—</div>
     </aside>
+    
     <main class="main-content">
-        <div class="page-header"><h1>Assessments</h1><span class="badge medium">DEMO MODE</span></div>
-        <div class="card">
-            <table class="data-table">
-                <thead><tr><th>ID</th><th>Name</th><th>Target</th><th>Date</th><th>Status</th><th>Findings</th></tr></thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-            <p style="color:var(--warning);font-size:10px;margin-top:12px;">⚠ All assessments shown are simulated for demonstration purposes.</p>
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Security Assessments</h1>
+                <p style="color: #94a3b8; margin: 5px 0 0 0;">Manage and track your authorised security testing.</p>
+            </div>
+            <button id="newAssessmentBtn" class="btn primary" style="padding: 10px 20px; background: #00ff9d; color: #0a0e17; font-weight: 700; border: none; border-radius: 6px; cursor: pointer;">+ New Assessment</button>
+        </div>
+
+        <div id="newAssessmentForm" class="form-container">
+            <h3 style="color: #fff; margin-top: 0;">Create Assessment</h3>
+            <div id="formError" style="display: none; color: #ef4444; background: #450a0a; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; border: 1px solid #ef4444;"></div>
+            <form id="assessmentForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Assessment Name *</label>
+                        <input type="text" id="assessName" required maxlength="200" placeholder="e.g. Q3 Web App Pentest">
+                    </div>
+                    <div class="form-group">
+                        <label>Target (URL or App) *</label>
+                        <input type="text" id="assessTarget" required placeholder="https://app.example.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Assessment Type *</label>
+                    <select id="assessType" required>
+                        <option value="">Select type...</option>
+                        <option value="web_app">Web Application Security Assessment</option>
+                        <option value="api">API Security Assessment</option>
+                        <option value="vulnerability">Vulnerability Assessment</option>
+                        <option value="code_review">Secure Code Review</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Scope</label>
+                    <textarea id="assessScope" rows="2" placeholder="Describe what is in scope (e.g. Login, Checkout, API endpoints)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Authorisation Proof * (Min 10 chars)</label>
+                    <textarea id="assessProof" rows="2" required placeholder="e.g. Signed letter from CEO dated 2026-01-01 authorising testing."></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="padding: 12px 24px; background: #00ff9d; color: #0a0e17; font-weight: 700; border: none; border-radius: 6px; cursor: pointer;">Submit Assessment</button>
+                    <button type="button" id="cancelBtn" style="padding: 12px 24px; background: transparent; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; cursor: pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="assessmentsList" class="assessment-grid">
+            <p style="color: #94a3b8;">Loading assessments...</p>
         </div>
     </main>
 </div>
-<div class="demo-watermark">DEMO</div>
-<script src="../data/demo-data.js"></script>
-<script>
-    const tbody = document.getElementById('tableBody');
-    DEMO.assessments.forEach(a => {
-        tbody.innerHTML += `<tr>
-            <td>${a.id}</td><td>${a.name}</td><td>${a.target}</td><td>${a.date}</td>
-            <td><span class="badge ${a.status.toLowerCase().replace(/ /g,'')}">${a.status}</span></td>
-            <td>${a.findings}</td>
-        </tr>`;
-    });
-</script>
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
+<script src="../js/assessments.js"></script>
 </body>
 </html>
