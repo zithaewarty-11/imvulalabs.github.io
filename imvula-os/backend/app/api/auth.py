@@ -41,6 +41,18 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
     return TokenResponse(access_token=create_access_token(user.id, user.org_id))
 
 
+
+
+@router.get("/users")
+def list_org_users(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """List all users in the current organisation (for assigning asset owners)."""
+    users = db.query(User).filter(User.org_id == user.org_id).all()
+    return [{"id": u.id, "email": u.email, "role": u.role} for u in users]
+
+
 @router.get("/me", response_model=UserOut)
 def me(user: User = Depends(get_current_user)):
     return user

@@ -7,6 +7,8 @@ class AssetCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     asset_type: str = Field(pattern="^(website|email|server|database|saas_app|other)$")
     criticality: str = Field(default="medium", pattern="^(low|medium|high|critical)$")
+    category: str = Field(default="general", max_length=50)
+    owner_id: int | None = None
     description: str = ""
 
 
@@ -18,6 +20,8 @@ class AssetUpdate(BaseModel):
     criticality: str | None = Field(
         default=None, pattern="^(low|medium|high|critical)$"
     )
+    category: str | None = Field(default=None, max_length=50)
+    owner_id: int | None = None
     description: str | None = None
 
 
@@ -27,6 +31,8 @@ class AssetOut(BaseModel):
     name: str
     asset_type: str
     criticality: str
+    category: str
+    owner_id: int | None
     description: str
     model_config = {"from_attributes": True}
 

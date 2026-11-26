@@ -17,6 +17,10 @@ class Asset(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     asset_type: Mapped[str] = mapped_column(String(50), nullable=False)
     criticality: Mapped[str] = mapped_column(String(20), default="medium")
+    category: Mapped[str] = mapped_column(String(50), default="general")
+    owner_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
     description: Mapped[str] = mapped_column(Text, default="")
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

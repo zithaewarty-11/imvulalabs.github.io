@@ -53,6 +53,16 @@ def create_asset(
 ):
     asset = Asset(org_id=user.org_id, created_by=user.id, **body.model_dump())
     db.add(asset)
+    db.flush()
+    record_audit(
+        db,
+        org_id=user.org_id,
+        actor_id=user.id,
+        action="asset.created",
+        target_type="asset",
+        target_id=asset.id,
+        details=body.name,
+    )
     db.commit()
     db.refresh(asset)
     return asset
@@ -88,8 +98,18 @@ def update_asset(
     user: User = Depends(get_current_user),
 ):
     asset = _get_asset_or_404(db, asset_id, user.org_id)
-    for field, value in body.model_dump(exclude_unset=True).items():
+    updates = body.model_dump(exclude_unset=True)
+    for field, value in updates.items():
         setattr(asset, field, value)
+    record_audit(
+        db,
+        org_id=user.org_id,
+        actor_id=user.id,
+        action="asset.updated",
+        target_type="asset",
+        target_id=asset.id,
+        details=",".join(updates.keys()) if updates else "",
+    )
     db.commit()
     db.refresh(asset)
     return asset
@@ -108,7 +128,19 @@ def delete_asset(
             status_code=409,
             detail="Cannot delete asset with existing risks. Delete the risks first.",
         )
+    asset_name = asset.name
+    asset_id_for_log = asset.id
     db.delete(asset)
+    db.flush()
+    record_audit(
+        db,
+        org_id=user.org_id,
+        actor_id=user.id,
+        action="asset.deleted",
+        target_type="asset",
+        target_id=asset_id_for_log,
+        details=asset_name,
+    )
     db.commit()
     return None
 
@@ -231,3 +263,35 @@ def update_remediation(
     db.commit()
     db.refresh(rem)
     return rem
+
+
+@router.get("/assets/{asset_id}/history")
+def asset_history(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Fetch the audit trail for a specific asset."""
+    _get_asset_or_404(db, asset_id, user.org_id)
+    from app.models.audit import AuditEvent
+    
+    events = (
+        db.query(AuditEvent)
+        .filter(
+            AuditEvent.org_id == user.org_id,
+            AuditEvent.target_type == "asset",
+            AuditEvent.target_id == asset_id
+        )
+        .order_by(AuditEvent.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": e.id,
+            "action": e.action,
+            "details": e.details,
+            "created_at": e.created_at,
+            "actor_id": e.actor_id
+        }
+        for e in events
+    ]

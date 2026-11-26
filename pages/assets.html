@@ -1,35 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com; img-src 'self' data:;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assets — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../css/application.css">
     <style>
-        .asset-form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
-        .asset-form input, .asset-form select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
-        .asset-form button { padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .asset-form { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
+        .asset-form input, .asset-form select { padding: 10px 12px; border: 1px solid #334155; border-radius: 6px; font-size: 13px; background: #0f172a; color: #fff; }
+        .asset-form input:focus, .asset-form select:focus { outline: none; border-color: #00ff9d; }
+        .asset-form button { padding: 10px 20px; background: #00ff9d; color: #0a0e17; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; }
         .asset-form button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .asset-form input:focus, .asset-form select:focus { outline: none; border-color: #2563eb; }
-        .form-error { color: #991b1b; background: #fef2f2; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+        .form-error { color: #ef4444; background: #450a0a; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; border: 1px solid #ef4444; }
         .form-error.show { display: block; }
-        @media (max-width: 768px) { .asset-form { grid-template-columns: 1fr; } }
+        .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge.low { background: #00ff9d; color: #0a0e17; }
+        .badge.medium { background: #eab308; color: #0a0e17; }
+        .badge.high { background: #f97316; color: #fff; }
+        .badge.critical { background: #ef4444; color: #fff; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #111827; border: 1px solid #334155; border-radius: 10px; padding: 24px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+        .timeline-item { border-left: 3px solid #00ff9d; padding-left: 15px; margin-bottom: 15px; }
+        .timeline-date { color: #94a3b8; font-size: 12px; }
+        
+        @media (max-width: 900px) { .asset-form { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand">
-            <img src="../assets/logo.svg" alt="Imvula Labs">
-            <span>Imvula<span class="accent">Labs</span></span>
-        </div>
+        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
             <a href="assessments.html"><span class="icon">📋</span><span>Assessments</span></a>
-            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="assets.html" class="active"><span class="icon">⌬</span><span>Assets</span></a>
+            <a href="vulnerabilities.html"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
             <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
             <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
@@ -40,120 +46,190 @@
         <div class="page-header"><h1>Business Assets</h1><span class="badge medium" id="countBadge">—</span></div>
 
         <div class="card">
-            <h3>Add an Asset</h3>
+            <h3 id="formTitle">Add an Asset</h3>
             <div class="form-error" id="formError"></div>
             <form class="asset-form" id="assetForm">
-                <input type="text" id="assetName" placeholder="Asset name (e.g. Company website)" required maxlength="200">
+                <input type="hidden" id="assetId">
+                <input type="text" id="assetName" placeholder="Asset name" required maxlength="200">
                 <select id="assetType" required>
                     <option value="">Type...</option>
-                    <option value="website">Website</option>
-                    <option value="email">Email</option>
-                    <option value="server">Server</option>
-                    <option value="database">Database</option>
-                    <option value="saas_app">SaaS App</option>
-                    <option value="other">Other</option>
+                    <option value="website">Website</option><option value="email">Email</option>
+                    <option value="server">Server</option><option value="database">Database</option>
+                    <option value="saas_app">SaaS App</option><option value="other">Other</option>
+                </select>
+                <select id="assetCategory">
+                    <option value="general">General</option><option value="web">Web</option>
+                    <option value="api">API</option><option value="infrastructure">Infrastructure</option>
+                    <option value="data">Data Store</option>
                 </select>
                 <select id="assetCriticality" required>
-                    <option value="low">Low</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
+                    <option value="low">Low</option><option value="medium" selected>Medium</option>
+                    <option value="high">High</option><option value="critical">Critical</option>
+                </select>
+                <select id="assetOwner">
+                    <option value="">Unassigned</option>
                 </select>
                 <button type="submit" id="submitBtn">Add Asset</button>
+                <button type="button" id="cancelEditBtn" style="display:none; background:#334155; color:#fff;" onclick="resetForm()">Cancel</button>
             </form>
         </div>
 
         <div class="card">
             <h3>Your Assets</h3>
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Criticality</th><th>Created</th></tr></thead>
-                <tbody id="assetsBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
+                <thead><tr><th>Name</th><th>Type</th><th>Category</th><th>Criticality</th><th>Owner</th><th>Actions</th></tr></thead>
+                <tbody id="assetsBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
             </table>
         </div>
     </main>
 </div>
+
+<!-- History Modal -->
+<div class="modal-overlay" id="historyModal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="color:#fff; margin:0;">Asset History</h3>
+            <button onclick="document.getElementById('historyModal').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer;">×</button>
+        </div>
+        <div id="historyList" style="color:#94a3b8;"></div>
+    </div>
+</div>
+
 <script src="../js/imvula-config.js"></script>
 <script src="../js/imvula-auth.js"></script>
 <script>
 (function () {
-    if (!window.ImvulaAuth.isLoggedIn()) {
-        window.location.href = window.IMVULA.url("pages/login.html");
-        return;
+    if (!window.ImvulaAuth.isLoggedIn()) { window.location.href = window.IMVULA.url("pages/login.html"); return; }
+    document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); window.ImvulaAuth.logout(); });
+
+    let orgUsers = [];
+    let assetsData = [];
+
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+    
+    function getOwnerName(id) {
+        const u = orgUsers.find(x => x.id === id);
+        return u ? u.email : "Unassigned";
     }
 
-    document.getElementById("logoutLink").addEventListener("click", function (e) {
+    async function loadData() {
+        try {
+            const [assets, users] = await Promise.all([
+                window.ImvulaAuth.api("/quantum/assets"),
+                window.ImvulaAuth.api("/auth/users")
+            ]);
+            assetsData = assets; orgUsers = users;
+            
+            // Populate Owner dropdown
+            const ownerSelect = document.getElementById("assetOwner");
+            ownerSelect.innerHTML = '<option value="">Unassigned</option>' + users.map(u => `<option value="${u.id}">${esc(u.email)}</option>`).join("");
+
+            renderTable();
+            document.getElementById("countBadge").textContent = assets.length + " assets";
+        } catch (err) { alert("Error loading data: " + err.message); }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById("assetsBody");
+        if (assetsData.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No assets yet.</td></tr>'; return; }
+        
+        tbody.innerHTML = assetsData.map(a => `
+            <tr>
+                <td>${esc(a.name)}</td>
+                <td>${esc(a.asset_type)}</td>
+                <td>${esc(a.category)}</td>
+                <td><span class="badge ${esc(a.criticality)}">${esc(a.criticality)}</span></td>
+                <td>${esc(getOwnerName(a.owner_id))}</td>
+                <td>
+                    <button onclick="editAsset(${a.id})" style="background:none; border:none; color:#00ff9d; cursor:pointer; margin-right:10px;">Edit</button>
+                    <button onclick="viewHistory(${a.id})" style="background:none; border:none; color:#eab308; cursor:pointer; margin-right:10px;">History</button>
+                    <button onclick="deleteAsset(${a.id})" style="background:none; border:none; color:#ef4444; cursor:pointer;">Delete</button>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    document.getElementById("assetForm").addEventListener("submit", async (e) => {
         e.preventDefault();
-        window.ImvulaAuth.logout();
-    });
+        const id = document.getElementById("assetId").value;
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true; btn.textContent = "Saving...";
+        
+        const body = {
+            name: document.getElementById("assetName").value.trim(),
+            asset_type: document.getElementById("assetType").value,
+            category: document.getElementById("assetCategory").value,
+            criticality: document.getElementById("assetCriticality").value,
+            owner_id: document.getElementById("assetOwner").value ? parseInt(document.getElementById("assetOwner").value) : null
+        };
 
-    function esc(s) {
-        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-        });
-    }
-
-    function loadAssets() {
-        return window.ImvulaAuth.api("/quantum/assets").then(function (assets) {
-            var tbody = document.getElementById("assetsBody");
-            document.getElementById("countBadge").textContent =
-                assets.length + " asset" + (assets.length === 1 ? "" : "s");
-
-            if (!assets || assets.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No assets yet. Add one above.</td></tr>';
-                return;
+        try {
+            if (id) {
+                await window.ImvulaAuth.api(`/quantum/assets/${id}`, { method: "PATCH", body });
+            } else {
+                await window.ImvulaAuth.api("/quantum/assets", { method: "POST", body });
             }
-
-            tbody.innerHTML = assets.map(function (a) {
-                return "<tr>" +
-                    "<td>#" + a.id + "</td>" +
-                    "<td>" + esc(a.name) + "</td>" +
-                    "<td>" + esc(a.asset_type) + "</td>" +
-                    '<td><span class="badge ' + esc(a.criticality) + '">' + esc(a.criticality) + "</span></td>" +
-                    "<td>—</td>" +
-                    "</tr>";
-            }).join("");
-        });
-    }
-
-    var form = document.getElementById("assetForm");
-    var btn = document.getElementById("submitBtn");
-    var errBox = document.getElementById("formError");
-
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        errBox.classList.remove("show");
-        btn.disabled = true;
-        btn.textContent = "Adding...";
-
-        window.ImvulaAuth.api("/quantum/assets", {
-            method: "POST",
-            body: {
-                name: document.getElementById("assetName").value.trim(),
-                asset_type: document.getElementById("assetType").value,
-                criticality: document.getElementById("assetCriticality").value,
-                description: ""
-            }
-        }).then(function () {
-            form.reset();
-            document.getElementById("assetCriticality").value = "medium";
-            btn.disabled = false;
-            btn.textContent = "Add Asset";
-            return loadAssets();
-        }).catch(function (err) {
-            errBox.textContent = err.message || "Failed to create asset";
-            errBox.classList.add("show");
-            btn.disabled = false;
-            btn.textContent = "Add Asset";
-        });
+            resetForm(); loadData();
+        } catch (err) {
+            const errBox = document.getElementById("formError");
+            errBox.textContent = err.message; errBox.classList.add("show");
+        } finally { btn.disabled = false; btn.textContent = id ? "Save Changes" : "Add Asset"; }
     });
 
-    window.ImvulaAuth.me().then(function (user) {
-        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
-        return loadAssets();
-    }).catch(function (err) {
-        errBox.textContent = "Error: " + (err.message || "failed to load");
-        errBox.classList.add("show");
-    });
+    window.resetForm = function() {
+        document.getElementById("assetForm").reset();
+        document.getElementById("assetId").value = "";
+        document.getElementById("formTitle").textContent = "Add an Asset";
+        document.getElementById("submitBtn").textContent = "Add Asset";
+        document.getElementById("cancelEditBtn").style.display = "none";
+        document.getElementById("formError").classList.remove("show");
+    };
+
+    window.editAsset = function(id) {
+        const a = assetsData.find(x => x.id === id);
+        if (!a) return;
+        document.getElementById("assetId").value = a.id;
+        document.getElementById("assetName").value = a.name;
+        document.getElementById("assetType").value = a.asset_type;
+        document.getElementById("assetCategory").value = a.category || "general";
+        document.getElementById("assetCriticality").value = a.criticality;
+        document.getElementById("assetOwner").value = a.owner_id || "";
+        
+        document.getElementById("formTitle").textContent = "Edit Asset";
+        document.getElementById("submitBtn").textContent = "Save Changes";
+        document.getElementById("cancelEditBtn").style.display = "inline-block";
+        window.scrollTo(0, 0);
+    };
+
+    window.deleteAsset = async function(id) {
+        if (!confirm("Are you sure you want to delete this asset? This cannot be undone.")) return;
+        try {
+            await window.ImvulaAuth.api(`/quantum/assets/${id}`, { method: "DELETE" });
+            loadData();
+        } catch (err) { alert("Error deleting: " + err.message); }
+    };
+
+    window.viewHistory = async function(id) {
+        const modal = document.getElementById("historyModal");
+        const list = document.getElementById("historyList");
+        list.innerHTML = "<p>Loading history...</p>";
+        modal.style.display = "flex";
+        
+        try {
+            const events = await window.ImvulaAuth.api(`/quantum/assets/${id}/history`);
+            if (events.length === 0) { list.innerHTML = "<p>No history recorded yet.</p>"; return; }
+            
+            list.innerHTML = events.map(e => `
+                <div class="timeline-item">
+                    <div class="timeline-date">${new Date(e.created_at).toLocaleString()}</div>
+                    <div style="color:#fff; font-weight:600; margin:5px 0;">${esc(e.action)}</div>
+                    <div style="font-size:13px;">${esc(e.details)}</div>
+                </div>
+            `).join("");
+        } catch (err) { list.innerHTML = `<p style="color:#ef4444;">Error: ${esc(err.message)}</p>`; }
+    };
+
+    loadData();
 })();
 </script>
 </body>
