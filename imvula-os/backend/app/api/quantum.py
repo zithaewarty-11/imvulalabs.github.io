@@ -295,3 +295,34 @@ def asset_history(
         }
         for e in events
     ]
+
+
+@router.get("/risks/{risk_id}/history")
+def risk_history(
+    risk_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Fetch the audit trail for a specific risk/vulnerability."""
+    _get_risk_or_404(db, risk_id, user.org_id)
+    from app.models.audit import AuditEvent
+    events = (
+        db.query(AuditEvent)
+        .filter(
+            AuditEvent.org_id == user.org_id,
+            AuditEvent.target_type == "risk",
+            AuditEvent.target_id == risk_id,
+        )
+        .order_by(AuditEvent.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": e.id,
+            "action": e.action,
+            "details": e.details,
+            "created_at": e.created_at,
+            "actor_id": e.actor_id,
+        }
+        for e in events
+    ]

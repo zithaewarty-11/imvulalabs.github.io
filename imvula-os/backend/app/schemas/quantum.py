@@ -42,6 +42,9 @@ class RiskCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str = ""
     severity: str = Field(default="medium", pattern="^(low|medium|high|critical)$")
+    assignee_id: int | None = None
+    evidence: str = ""
+    remediation_notes: str = ""
 
 
 class RiskUpdate(BaseModel):
@@ -53,6 +56,9 @@ class RiskUpdate(BaseModel):
     status: str | None = Field(
         default=None, pattern="^(open|in_progress|resolved|accepted)$"
     )
+    assignee_id: int | None = None
+    evidence: str | None = None
+    remediation_notes: str | None = None
 
 
 class RiskOut(BaseModel):
@@ -63,6 +69,9 @@ class RiskOut(BaseModel):
     description: str
     severity: str
     status: str
+    assignee_id: int | None
+    evidence: str
+    remediation_notes: str
     model_config = {"from_attributes": True}
 
 
