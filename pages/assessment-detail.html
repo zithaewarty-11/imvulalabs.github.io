@@ -41,9 +41,17 @@
     </aside>
     
     <main class="main-content">
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <a href="assessments.html" style="color: #00ff9d; text-decoration: none; font-size: 14px;">← Back to Assessments</a>
+            <button id="generateReportBtn" onclick="generateReport()" style="display:none; padding: 10px 20px; background: #00ff9d; color: #0a0e17; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 14px;">🖨️ Generate PDF Report</button>
         </div>
+        <script>
+            function generateReport() {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get("id");
+                if (id) window.location.href = "assessment-report.html?id=" + id;
+            }
+        </script>
         <div id="assessmentDetail">
             <p style="color: #94a3b8;">Loading assessment details...</p>
         </div>

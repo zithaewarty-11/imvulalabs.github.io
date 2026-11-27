@@ -42,7 +42,8 @@
                             <p><strong style="color:#e2e8f0;">Date:</strong> ${new Date(a.created_at).toLocaleDateString()}</p>
                         </div>
                         <div style="margin-top:15px; padding-top:15px; border-top:1px solid #1e293b; text-align:right;">
-                            <a href="assessment-detail.html?id=${a.id}" style="color:#00ff9d; text-decoration:none; font-size:14px; font-weight:600;">View Details →</a>
+                            <a href="assessment-detail.html?id=${a.id}" style="color:#00ff9d; text-decoration:none; font-size:14px; font-weight:600; margin-right:15px;">View Details →</a>
+                            <a href="assessment-report.html?id=${a.id}" style="color:#eab308; text-decoration:none; font-size:14px; font-weight:600;">📄 Report</a>
                         </div>
                     </div>
                 `).join("");

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Report — Imvula Labs</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; margin: 0; padding: 0; color: #111; }
+        .toolbar { position: sticky; top: 0; background: #111827; border-bottom: 1px solid #334155; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .toolbar a { color: #00ff9d; text-decoration: none; font-size: 14px; }
+        .toolbar button { background: #00ff9d; color: #0a0e17; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .toolbar button:hover { background: #00e68a; }
+
+        .report-page { max-width: 850px; margin: 30px auto; background: #fff; padding: 60px 70px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+        .report-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #111827; padding-bottom: 20px; margin-bottom: 30px; }
+        .report-header h1 { margin: 0; font-size: 26px; color: #111827; }
+        .report-header .tagline { color: #64748b; font-size: 13px; margin-top: 4px; }
+        .report-meta { text-align: right; font-size: 12px; color: #64748b; line-height: 1.6; }
+
+        .section { margin-bottom: 32px; }
+        .section h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 1px; color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 14px; }
+        .section p { margin: 0 0 10px 0; line-height: 1.7; color: #374151; font-size: 14px; }
+
+        .info-grid { display: grid; grid-template-columns: 180px 1fr; gap: 8px 20px; font-size: 14px; }
+        .info-grid .label { color: #6b7280; font-weight: 600; }
+        .info-grid .value { color: #111827; }
+
+        .summary-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+        .summary-box .stat { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; text-align: center; }
+        .summary-box .stat .num { font-size: 28px; font-weight: 800; line-height: 1; }
+        .summary-box .stat .lbl { font-size: 11px; text-transform: uppercase; color: #6b7280; margin-top: 6px; letter-spacing: 0.5px; }
+        .stat.critical .num { color: #dc2626; }
+        .stat.high .num { color: #ea580c; }
+        .stat.medium .num { color: #ca8a04; }
+        .stat.low .num { color: #16a34a; }
+
+        .risk-summary { display: flex; align-items: center; gap: 20px; margin: 20px 0; padding: 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #111827; }
+        .risk-summary .score { font-size: 44px; font-weight: 800; line-height: 1; }
+        .risk-summary .score-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .risk-summary .text { flex: 1; font-size: 14px; color: #374151; line-height: 1.6; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+        th { background: #f3f4f6; text-align: left; padding: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #374151; border-bottom: 2px solid #d1d5db; }
+        td { padding: 12px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; color: #374151; }
+        .severity { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .severity.critical { background: #dc2626; color: #fff; }
+        .severity.high { background: #ea580c; color: #fff; }
+        .severity.medium { background: #ca8a04; color: #fff; }
+        .severity.low { background: #16a34a; color: #fff; }
+
+        .remediation-list { padding-left: 0; list-style: none; margin: 0; }
+        .remediation-list li { padding: 12px 0; border-bottom: 1px solid #e5e7eb; font-size: 13px; color: #374151; line-height: 1.6; }
+        .remediation-list li:last-child { border-bottom: none; }
+        .remediation-list li strong { color: #111827; display: block; margin-bottom: 4px; }
+
+        .report-footer { border-top: 1px solid #e5e7eb; margin-top: 40px; padding-top: 20px; font-size: 11px; color: #6b7280; line-height: 1.6; }
+
+        @media print {
+            .toolbar { display: none !important; }
+            body { background: white !important; }
+            .report-page { box-shadow: none !important; margin: 0 !important; padding: 40px !important; max-width: 100% !important; }
+            .section { page-break-inside: avoid; }
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            .summary-box, .risk-summary { page-break-inside: avoid; }
+        }
+
+        @media (max-width: 700px) {
+            .report-page { padding: 30px 20px; margin: 10px; }
+            .info-grid { grid-template-columns: 1fr; gap: 4px; }
+            .info-grid .label { margin-top: 8px; }
+            .summary-box { grid-template-columns: repeat(2, 1fr); }
+            .risk-summary { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toolbar">
+    <a href="assessments.html">← Back to Assessments</a>
+    <button onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+<div class="report-page" id="report">
+    <p style="text-align:center; color:#6b7280; padding: 60px 0;">Loading report...</p>
+</div>
+
+<script src="../js/imvula-config.js"></script>
+<script src="../js/imvula-auth.js"></script>
+<script>
+(function () {
+    if (!window.ImvulaAuth || !window.ImvulaAuth.isLoggedIn()) {
+        window.location.href = window.IMVULA.url("pages/login.html");
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    if (!id) { document.getElementById("report").innerHTML = "<p style='color:#dc2626;'>No assessment ID provided.</p>"; return; }
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[c]));
+    }
+
+    function fmtDate(iso) {
+        if (!iso) return "—";
+        try { const d = new Date(iso.includes("Z") || iso.includes("+") ? iso : iso + "Z"); return d.toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' }); }
+        catch (e) { return iso; }
+    }
+
+    function fmtType(t) {
+        return { web_app: "Web Application Security Assessment", api: "API Security Assessment", vulnerability: "Vulnerability Assessment", code_review: "Secure Code Review" }[t] || t;
+    }
+
+    function computeScore(findings) {
+        let score = 100;
+        findings.forEach(f => {
+            if (f.severity === "critical") score -= 25;
+            else if (f.severity === "high") score -= 10;
+            else if (f.severity === "medium") score -= 3;
+            else if (f.severity === "low") score -= 1;
+        });
+        return Math.max(0, score);
+    }
+
+    function riskLevel(score) {
+        if (score >= 80) return { label: "LOW", color: "#16a34a" };
+        if (score >= 60) return { label: "MEDIUM", color: "#ca8a04" };
+        if (score >= 40) return { label: "HIGH", color: "#ea580c" };
+        return { label: "CRITICAL", color: "#dc2626" };
+    }
+
+    Promise.all([
+        window.ImvulaAuth.api(`/assessments/${id}`),
+        window.ImvulaAuth.api(`/assessments/${id}/findings`),
+        window.ImvulaAuth.me()
+    ]).then(([assessment, findings, user]) => {
+        const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+        findings.forEach(f => { if (counts[f.severity] !== undefined) counts[f.severity]++; });
+
+        const score = computeScore(findings);
+        const risk = riskLevel(score);
+        const total = findings.length;
+
+        const refNum = "IMV-RPT-" + String(assessment.id).padStart(4, "0") + "-" + new Date().getFullYear();
+        const today = fmtDate(new Date().toISOString());
+
+        // Executive summary
+        let summaryText;
+        if (total === 0) {
+            summaryText = `This assessment was created on ${fmtDate(assessment.created_at)} and is currently in <strong>${esc(assessment.status)}</strong> status. No findings have been recorded yet. The assessment is awaiting completion of the testing phase. Once findings are added, a full risk analysis and remediation plan will be generated here.`;
+        } else {
+            summaryText = `Imvula Labs conducted a <strong>${esc(fmtType(assessment.assessment_type))}</strong> against <strong>${esc(assessment.target)}</strong>. A total of <strong>${total}</strong> finding${total === 1 ? "" : "s"} were recorded across ${esc(assessment.scope || "the defined scope")}. Of these, <strong>${counts.critical}</strong> are rated Critical, <strong>${counts.high}</strong> High, <strong>${counts.medium}</strong> Medium, and <strong>${counts.low}</strong> Low. The overall security posture of the target is assessed as <strong style="color:${risk.color};">${risk.label}</strong> with a calculated security score of <strong>${score}/100</strong>. ${counts.critical > 0 ? "Immediate remediation of critical findings is strongly recommended." : "No critical findings were identified during this assessment."}`;
+        }
+
+        // Conclusion
+        let conclusionText;
+        if (total === 0) {
+            conclusionText = "The assessment is not yet complete. Findings and remediation guidance will appear in this report once the testing phase has concluded.";
+        } else if (counts.critical > 0) {
+            conclusionText = "The application has critical vulnerabilities that pose an immediate risk to business operations and data security. We recommend pausing any new feature development and prioritising the remediation of critical and high-severity findings before proceeding. A follow-up verification assessment should be scheduled once fixes are deployed.";
+        } else if (counts.high > 0) {
+            conclusionText = "The application has high-severity vulnerabilities that should be addressed within the next 30 days. While no critical issues were identified, the current findings represent material risk and require prompt remediation. We recommend planning the necessary work sprints to close these gaps.";
+        } else if (counts.medium > 0) {
+            conclusionText = "The application demonstrates a reasonable security posture. The medium-severity findings should be addressed within the next 90 days as part of routine security hygiene. No critical or high-severity issues were identified during this assessment.";
+        } else {
+            conclusionText = "The application demonstrates a strong security posture. Only low-severity findings were identified, and these should be addressed during the next regular maintenance cycle. No material risk was identified during this assessment.";
+        }
+
+        // Findings table
+        const findingsHtml = total === 0
+            ? '<tr><td colspan="4" style="text-align:center; color:#6b7280; padding:20px;">No findings recorded yet.</td></tr>'
+            : findings.map(f => `
+                <tr>
+                    <td><strong>${esc(f.title)}</strong></td>
+                    <td><span class="severity ${esc(f.severity)}">${esc(f.severity)}</span></td>
+                    <td>${esc(f.description) || "—"}</td>
+                    <td>${esc(f.remediation) || "<em style='color:#9ca3af;'>Pending</em>"}</td>
+                </tr>
+            `).join("");
+
+        // Remediation list
+        const remediations = findings.filter(f => f.remediation && f.remediation.trim());
+        const remediationHtml = remediations.length === 0
+            ? '<p style="color:#6b7280;">No remediation recommendations have been recorded yet.</p>'
+            : '<ul class="remediation-list">' + remediations.map(f => `
+                <li>
+                    <strong>${esc(f.title)} <span class="severity ${esc(f.severity)}" style="margin-left:6px;">${esc(f.severity)}</span></strong>
+                    ${esc(f.remediation)}
+                </li>
+            `).join("") + '</ul>';
+
+        document.getElementById("report").innerHTML = `
+            <div class="report-header">
+                <div>
+                    <h1>Security Assessment Report</h1>
+                    <div class="tagline">Understand the risk. Prioritise the fix.</div>
+                </div>
+                <div class="report-meta">
+                    <div><strong>Imvula Labs</strong></div>
+                    <div>info@imvulalabs.co.za</div>
+                    <div>Report Ref: ${esc(refNum)}</div>
+                    <div>Generated: ${esc(today)}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>1. Assessment Information</h2>
+                <div class="info-grid">
+                    <div class="label">Client Organisation</div><div class="value">Organisation #${user.org_id}</div>
+                    <div class="label">Assessment Name</div><div class="value">${esc(assessment.name)}</div>
+                    <div class="label">Target</div><div class="value">${esc(assessment.target)}</div>
+                    <div class="label">Assessment Type</div><div class="value">${esc(fmtType(assessment.assessment_type))}</div>
+                    <div class="label">Assessment Date</div><div class="value">${esc(fmtDate(assessment.created_at))}</div>
+                    <div class="label">Current Status</div><div class="value">${esc(assessment.status).toUpperCase()}</div>
+                    <div class="label">Scope</div><div class="value">${esc(assessment.scope) || "Not specified"}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>2. Executive Summary</h2>
+                <p>${summaryText}</p>
+                <div class="risk-summary">
+                    <div>
+                        <div class="score" style="color:${risk.color};">${score}<span style="font-size:16px; color:#9ca3af;">/100</span></div>
+                        <div class="score-label">Security Score</div>
+                    </div>
+                    <div style="border-left:1px solid #d1d5db; padding-left:20px;">
+                        <div style="font-size:26px; font-weight:800; color:${risk.color};">${risk.label}</div>
+                        <div class="score-label">Overall Risk Level</div>
+                    </div>
+                    <div class="text">Findings by severity: <strong>${counts.critical}</strong> Critical, <strong>${counts.high}</strong> High, <strong>${counts.medium}</strong> Medium, <strong>${counts.low}</strong> Low.</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>3. Findings Summary</h2>
+                <div class="summary-box">
+                    <div class="stat critical"><div class="num">${counts.critical}</div><div class="lbl">Critical</div></div>
+                    <div class="stat high"><div class="num">${counts.high}</div><div class="lbl">High</div></div>
+                    <div class="stat medium"><div class="num">${counts.medium}</div><div class="lbl">Medium</div></div>
+                    <div class="stat low"><div class="num">${counts.low}</div><div class="lbl">Low</div></div>
+                </div>
+
+                <table>
+                    <thead><tr><th>Finding</th><th>Severity</th><th>Description</th><th>Remediation</th></tr></thead>
+                    <tbody>${findingsHtml}</tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>4. Recommended Remediation</h2>
+                ${remediationHtml}
+            </div>
+
+            <div class="section">
+                <h2>5. Conclusion</h2>
+                <p>${conclusionText}</p>
+            </div>
+
+            <div class="report-footer">
+                <p><strong>Simulation Notice:</strong> This report is generated from assessment data recorded in the Imvula OS platform. Findings reflect the information entered by the client or Imvula Labs analysts during the assessment. No automated scanning was performed by this report generator.</p>
+                <p>© ${new Date().getFullYear()} Imvula Labs. All rights reserved. | Report Reference: ${esc(refNum)} | Generated on ${esc(today)}</p>
+            </div>
+        `;
+    }).catch(err => {
+        document.getElementById("report").innerHTML = `<p style="color:#dc2626; padding:40px;">Error loading report: ${esc(err.message)}</p>`;
+    });
+})();
+</script>
+</body>
+</html>
