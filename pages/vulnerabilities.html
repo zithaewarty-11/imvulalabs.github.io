@@ -1,59 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://imvula-os-api-xs76.onrender.com; img-src 'self' data:;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Risks — Imvula Labs</title>
+    <title>Vulnerabilities — Imvula Labs</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../css/application.css">
     <style>
-        .risk-form { display: grid; grid-template-columns: 2fr 2fr 1fr auto; gap: 10px; margin-bottom: 20px; }
-        .risk-form input, .risk-form select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-        .risk-form input:focus, .risk-form select:focus { outline: none; border-color: #2563eb; }
-        .risk-form button { padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .risk-form { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr auto; gap: 10px; margin-bottom: 16px; }
+        .risk-form input, .risk-form select { padding: 10px 12px; border: 1px solid #334155; border-radius: 6px; font-size: 13px; background: #0f172a; color: #fff; box-sizing: border-box; }
+        .risk-form input:focus, .risk-form select:focus { outline: none; border-color: #00ff9d; }
+        .risk-form button { padding: 10px 20px; background: #00ff9d; color: #0a0e17; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; white-space: nowrap; }
         .risk-form button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .form-error { color: #991b1b; background: #fef2f2; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+        .form-error { color: #ef4444; background: #450a0a; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; border: 1px solid #ef4444; }
         .form-error.show { display: block; }
-        .no-assets { background: #fef3c7; color: #92400e; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
-        .no-assets.show { display: block; }
-        .filters { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
-        .filters select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
-        @media (max-width: 768px) { .risk-form { grid-template-columns: 1fr; } }
-    
-        @media print {
-            .sidebar, .risk-form, .no-assets, .filters, .page-header, .form-error { display: none !important; }
-            .app-layout { display: block !important; }
-            .main-content { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
-            .card { box-shadow: none !important; border: 1px solid #ccc !important; }
-            body { background: white !important; font-size: 12px; }
-            .data-table th, .data-table td { padding: 8px !important; }
-            h1 { font-size: 20px !important; margin-bottom: 20px !important; }
-            /* Add a professional header for the printout */
-            .main-content::before {
-                content: "Imvula Labs - Security Risk Report";
-                display: block;
-                font-size: 24px;
-                font-weight: bold;
-                margin-bottom: 20px;
-                border-bottom: 2px solid #000;
-                padding-bottom: 10px;
-            }
-        }
+        .filters { margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .filters select { padding: 8px 12px; border: 1px solid #334155; border-radius: 6px; font-size: 13px; background: #0f172a; color: #fff; }
+        .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge.low { background: #00ff9d; color: #0a0e17; }
+        .badge.medium { background: #eab308; color: #0a0e17; }
+        .badge.high { background: #f97316; color: #fff; }
+        .badge.critical { background: #ef4444; color: #fff; }
+        .badge.open { background: #ef4444; color: #fff; }
+        .badge.in_progress { background: #3b82f6; color: #fff; }
+        .badge.resolved { background: #00ff9d; color: #0a0e17; }
+        .badge.accepted { background: #64748b; color: #fff; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #111827; border: 1px solid #334155; border-radius: 10px; padding: 24px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
+        .modal-content label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #fff; font-size: 13px; box-sizing: border-box; margin-bottom: 12px; }
+        .modal-content textarea { resize: vertical; }
+        .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { outline: none; border-color: #00ff9d; }
+        .timeline-item { border-left: 3px solid #00ff9d; padding-left: 15px; margin-bottom: 15px; }
+        .timeline-date { color: #94a3b8; font-size: 12px; }
+        .timeline-action { color: #fff; font-weight: 600; margin: 5px 0; text-transform: capitalize; }
+
+        @media (max-width: 900px) { .risk-form { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 <div class="app-layout">
     <aside class="sidebar">
-        <div class="sidebar-brand">
-            <img src="../assets/logo.svg" alt="Imvula Labs">
-            <span>Imvula<span class="accent">Labs</span></span>
-        </div>
+        <div class="sidebar-brand"><img src="../assets/logo.svg" alt="Imvula Labs"><span>Imvula<span class="accent">Labs</span></span></div>
         <nav>
             <a href="dashboard.html"><span class="icon">◈</span><span>Dashboard</span></a>
             <a href="assessments.html"><span class="icon">📋</span><span>Assessments</span></a>
-            <a href="vulnerabilities.html" class="active"><span class="icon">⌁</span><span>Risks</span></a>
             <a href="assets.html"><span class="icon">⌬</span><span>Assets</span></a>
+            <a href="vulnerabilities.html" class="active"><span class="icon">⌁</span><span>Vulnerabilities</span></a>
             <a href="reports.html"><span class="icon">▣</span><span>Reports</span></a>
             <a href="ai-security.html"><span class="icon">◎</span><span>AI Agents</span></a>
             <a href="#" id="logoutLink"><span class="icon">↩</span><span>Sign Out</span></a>
@@ -61,16 +54,16 @@
         <div class="sidebar-footer" id="userFooter">—</div>
     </aside>
     <main class="main-content">
-        <div class="page-header"><h1>Security Risks</h1><span class="badge medium" id="countBadge">—</span></div>
+        <div class="page-header"><h1>Vulnerability Management</h1><span class="badge medium" id="countBadge">—</span></div>
 
         <div class="card">
-            <h3>Report a Risk</h3>
-            <div class="no-assets" id="noAssetsWarn">
-                You need at least one asset first. <a href="assets.html">Add an asset</a>.
+            <h3>Report a Vulnerability</h3>
+            <div id="noAssetsWarn" style="display:none; background:#fef3c7; color:#92400e; padding:10px 14px; border-radius:6px; font-size:13px; margin-bottom:12px;">
+                You need at least one asset first. <a href="assets.html" style="color:#92400e; font-weight:700;">Add an asset</a>.
             </div>
             <div class="form-error" id="formError"></div>
             <form class="risk-form" id="riskForm">
-                <input type="text" id="riskTitle" placeholder="Risk title (e.g. Missing HTTPS)" required maxlength="200">
+                <input type="text" id="riskTitle" placeholder="Vulnerability title" required maxlength="200">
                 <select id="riskAsset" required>
                     <option value="">Select asset...</option>
                 </select>
@@ -80,14 +73,16 @@
                     <option value="high">High</option>
                     <option value="critical">Critical</option>
                 </select>
-                <button type="submit" id="submitBtn">Add Risk</button>
+                <select id="riskAssignee">
+                    <option value="">Assignee...</option>
+                </select>
+                <button type="submit" id="submitBtn">Add Vulnerability</button>
             </form>
         </div>
 
         <div class="card">
-            <div class="filters" style="justify-content: space-between;">
-                <div>
-                    <label for="severityFilter" style="font-size:13px;color:var(--muted);">Filter:</label>
+            <div class="filters">
+                <label for="severityFilter" style="font-size:13px;color:#94a3b8;">Filter:</label>
                 <select id="severityFilter">
                     <option value="">All severities</option>
                     <option value="critical">Critical</option>
@@ -95,125 +90,206 @@
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                 </select>
-                </div>
-                <button onclick="window.print()" class="btn primary" style="padding: 6px 12px; font-size: 13px; background: #111827; border: none; border-radius: 6px; color: white; cursor: pointer;">🖨️ Export Report</button>
+                <select id="statusFilter">
+                    <option value="">All statuses</option>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="accepted">Accepted</option>
+                </select>
             </div>
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Asset</th></tr></thead>
-                <tbody id="risksBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading...</td></tr></tbody>
+                <thead><tr><th>Title</th><th>Asset</th><th>Severity</th><th>Status</th><th>Assignee</th><th>Actions</th></tr></thead>
+                <tbody id="risksBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </main>
 </div>
+
+<div class="modal-overlay" id="detailModal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="color:#fff; margin:0;" id="modalTitle">Vulnerability Details</h3>
+            <button onclick="closeDetail()" style="background:none; border:none; color:#94a3b8; font-size:24px; cursor:pointer;">×</button>
+        </div>
+        <input type="hidden" id="editRiskId">
+        <label>Title</label>
+        <input type="text" id="editTitle">
+        <label>Severity</label>
+        <select id="editSeverity">
+            <option value="low">Low</option><option value="medium">Medium</option>
+            <option value="high">High</option><option value="critical">Critical</option>
+        </select>
+        <label>Status</label>
+        <select id="editStatus">
+            <option value="open">Open</option><option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option><option value="accepted">Accepted</option>
+        </select>
+        <label>Assignee</label>
+        <select id="editAssignee"><option value="">Unassigned</option></select>
+        <label>Description</label>
+        <textarea id="editDescription" rows="3"></textarea>
+        <label>Evidence (URLs, screenshots, PoC notes)</label>
+        <textarea id="editEvidence" rows="2"></textarea>
+        <label>Remediation Notes</label>
+        <textarea id="editRemediation" rows="2"></textarea>
+        <div style="display:flex; gap:10px; margin-top:8px;">
+            <button onclick="saveEdit()" style="flex:1; padding:12px; background:#00ff9d; color:#0a0e17; border:none; border-radius:6px; font-weight:700; cursor:pointer;">Save Changes</button>
+            <button onclick="viewHistory()" style="padding:12px 20px; background:#334155; color:#fff; border:none; border-radius:6px; cursor:pointer;">History</button>
+        </div>
+        <div id="historyPanel" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid #334155;"></div>
+    </div>
+</div>
+
 <script src="../js/imvula-config.js"></script>
 <script src="../js/imvula-auth.js"></script>
 <script>
 (function () {
-    if (!window.ImvulaAuth.isLoggedIn()) {
-        window.location.href = window.IMVULA.url("pages/login.html");
-        return;
-    }
+    if (!window.ImvulaAuth.isLoggedIn()) { window.location.href = window.IMVULA.url("pages/login.html"); return; }
+    document.getElementById("logoutLink").addEventListener("click", (e) => { e.preventDefault(); window.ImvulaAuth.logout(); });
 
-    document.getElementById("logoutLink").addEventListener("click", function (e) {
-        e.preventDefault();
-        window.ImvulaAuth.logout();
-    });
+    let assetMap = {}, orgUsers = [], risksData = [];
 
-    function esc(s) {
-        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-        });
-    }
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+    function userLabel(id) { if (!id) return "Unassigned"; const u = orgUsers.find(x => x.id === id); return u ? u.email : "#" + id; }
 
-    var assetMap = {};
-
-    function loadAssetsForForm() {
-        return window.ImvulaAuth.api("/quantum/assets").then(function (assets) {
-            var sel = document.getElementById("riskAsset");
+    async function loadAll() {
+        try {
+            const [assets, users] = await Promise.all([
+                window.ImvulaAuth.api("/quantum/assets"),
+                window.ImvulaAuth.api("/auth/users")
+            ]);
+            orgUsers = users;
             assetMap = {};
-            sel.innerHTML = '<option value="">Select asset...</option>';
-            assets.forEach(function (a) {
-                assetMap[a.id] = a.name;
-                sel.innerHTML += '<option value="' + a.id + '">' + esc(a.name) + "</option>";
-            });
+            const assetSel = document.getElementById("riskAsset");
+            assetSel.innerHTML = '<option value="">Select asset...</option>';
+            assets.forEach(a => { assetMap[a.id] = a.name; assetSel.innerHTML += `<option value="${a.id}">${esc(a.name)}</option>`; });
 
-            var warn = document.getElementById("noAssetsWarn");
-            var form = document.getElementById("riskForm");
-            if (assets.length === 0) {
-                warn.classList.add("show");
-                form.style.display = "none";
-            } else {
-                warn.classList.remove("show");
-                form.style.display = "";
-            }
-        });
+            const assigneeSel = document.getElementById("riskAssignee");
+            assigneeSel.innerHTML = '<option value="">Unassigned</option>' + users.map(u => `<option value="${u.id}">${esc(u.email)}</option>`).join("");
+
+            const editAssigneeSel = document.getElementById("editAssignee");
+            editAssigneeSel.innerHTML = '<option value="">Unassigned</option>' + users.map(u => `<option value="${u.id}">${esc(u.email)}</option>`).join("");
+
+            const warn = document.getElementById("noAssetsWarn");
+            const form = document.getElementById("riskForm");
+            if (assets.length === 0) { warn.style.display = "block"; form.style.display = "none"; }
+            else { warn.style.display = "none"; form.style.display = ""; }
+
+            await loadRisks();
+        } catch (err) { alert("Load error: " + err.message); }
     }
 
-    function loadRisks() {
-        var sev = document.getElementById("severityFilter").value;
-        var q = sev ? "?severity=" + encodeURIComponent(sev) : "";
-        return window.ImvulaAuth.api("/quantum/risks" + q).then(function (risks) {
-            var tbody = document.getElementById("risksBody");
-            document.getElementById("countBadge").textContent =
-                risks.length + " risk" + (risks.length === 1 ? "" : "s");
+    async function loadRisks() {
+        const sev = document.getElementById("severityFilter").value;
+        const stat = document.getElementById("statusFilter").value;
+        const params = new URLSearchParams();
+        if (sev) params.set("severity", sev);
+        if (stat) params.set("status_filter", stat);
+        const qs = params.toString() ? "?" + params.toString() : "";
 
-            if (risks.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No risks yet.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = risks.map(function (r) {
-                return "<tr>" +
-                    "<td>#" + r.id + "</td>" +
-                    "<td>" + esc(r.title) + "</td>" +
-                    '<td><span class="badge ' + esc(r.severity) + '">' + esc(r.severity) + "</span></td>" +
-                    '<td><span class="badge ' + esc(r.status).replace(/[\s_]/g, "") + '">' + esc(r.status) + "</span></td>" +
-                    "<td>" + esc(assetMap[r.asset_id] || ("#" + r.asset_id)) + "</td>" +
-                    "</tr>";
-            }).join("");
-        });
+        const risks = await window.ImvulaAuth.api("/quantum/risks" + qs);
+        risksData = risks;
+        document.getElementById("countBadge").textContent = risks.length + " vulnerabilities";
+
+        const tbody = document.getElementById("risksBody");
+        if (risks.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No vulnerabilities yet.</td></tr>'; return; }
+        tbody.innerHTML = risks.map(r => `
+            <tr>
+                <td><strong style="color:#fff;">${esc(r.title)}</strong></td>
+                <td>${esc(assetMap[r.asset_id] || "#" + r.asset_id)}</td>
+                <td><span class="badge ${esc(r.severity)}">${esc(r.severity)}</span></td>
+                <td><span class="badge ${esc(r.status)}">${esc(r.status).replace('_',' ')}</span></td>
+                <td>${esc(userLabel(r.assignee_id))}</td>
+                <td><button onclick="openDetail(${r.id})" style="background:none; border:none; color:#00ff9d; cursor:pointer;">Edit / Details</button></td>
+            </tr>
+        `).join("");
     }
 
     document.getElementById("severityFilter").addEventListener("change", loadRisks);
+    document.getElementById("statusFilter").addEventListener("change", loadRisks);
 
-    var form = document.getElementById("riskForm");
-    var btn = document.getElementById("submitBtn");
-    var errBox = document.getElementById("formError");
-
-    form.addEventListener("submit", function (e) {
+    document.getElementById("riskForm").addEventListener("submit", async (e) => {
         e.preventDefault();
+        const btn = document.getElementById("submitBtn");
+        const errBox = document.getElementById("formError");
         errBox.classList.remove("show");
-        btn.disabled = true;
-        btn.textContent = "Adding...";
-
-        window.ImvulaAuth.api("/quantum/risks", {
-            method: "POST",
-            body: {
-                title: document.getElementById("riskTitle").value.trim(),
-                asset_id: parseInt(document.getElementById("riskAsset").value, 10),
-                severity: document.getElementById("riskSeverity").value,
-                description: ""
-            }
-        }).then(function () {
-            form.reset();
+        btn.disabled = true; btn.textContent = "Adding...";
+        try {
+            await window.ImvulaAuth.api("/quantum/risks", {
+                method: "POST",
+                body: {
+                    asset_id: parseInt(document.getElementById("riskAsset").value),
+                    title: document.getElementById("riskTitle").value.trim(),
+                    severity: document.getElementById("riskSeverity").value,
+                    assignee_id: document.getElementById("riskAssignee").value ? parseInt(document.getElementById("riskAssignee").value) : null,
+                    description: "", evidence: "", remediation_notes: ""
+                }
+            });
+            document.getElementById("riskForm").reset();
             document.getElementById("riskSeverity").value = "medium";
-            btn.disabled = false;
-            btn.textContent = "Add Risk";
-            return loadRisks();
-        }).catch(function (err) {
-            errBox.textContent = err.message || "Failed to create risk";
-            errBox.classList.add("show");
-            btn.disabled = false;
-            btn.textContent = "Add Risk";
-        });
+            await loadRisks();
+        } catch (err) {
+            errBox.textContent = err.message; errBox.classList.add("show");
+        } finally { btn.disabled = false; btn.textContent = "Add Vulnerability"; }
     });
 
-    window.ImvulaAuth.me().then(function (user) {
-        document.getElementById("userFooter").textContent = user.email + " · " + user.role;
-        return loadAssetsForForm();
-    }).then(loadRisks).catch(function (err) {
-        errBox.textContent = "Error: " + (err.message || "failed to load");
-        errBox.classList.add("show");
-    });
+    window.openDetail = function(id) {
+        const r = risksData.find(x => x.id === id);
+        if (!r) return;
+        document.getElementById("editRiskId").value = r.id;
+        document.getElementById("modalTitle").textContent = "Vulnerability #" + r.id;
+        document.getElementById("editTitle").value = r.title;
+        document.getElementById("editSeverity").value = r.severity;
+        document.getElementById("editStatus").value = r.status;
+        document.getElementById("editAssignee").value = r.assignee_id || "";
+        document.getElementById("editDescription").value = r.description || "";
+        document.getElementById("editEvidence").value = r.evidence || "";
+        document.getElementById("editRemediation").value = r.remediation_notes || "";
+        document.getElementById("historyPanel").style.display = "none";
+        document.getElementById("detailModal").style.display = "flex";
+    };
+    window.closeDetail = function() { document.getElementById("detailModal").style.display = "none"; };
+
+    window.saveEdit = async function() {
+        const id = document.getElementById("editRiskId").value;
+        try {
+            await window.ImvulaAuth.api(`/quantum/risks/${id}`, {
+                method: "PATCH",
+                body: {
+                    title: document.getElementById("editTitle").value.trim(),
+                    severity: document.getElementById("editSeverity").value,
+                    status: document.getElementById("editStatus").value,
+                    assignee_id: document.getElementById("editAssignee").value ? parseInt(document.getElementById("editAssignee").value) : null,
+                    description: document.getElementById("editDescription").value,
+                    evidence: document.getElementById("editEvidence").value,
+                    remediation_notes: document.getElementById("editRemediation").value
+                }
+            });
+            closeDetail();
+            await loadRisks();
+        } catch (err) { alert("Save failed: " + err.message); }
+    };
+
+    window.viewHistory = async function() {
+        const id = document.getElementById("editRiskId").value;
+        const panel = document.getElementById("historyPanel");
+        panel.innerHTML = "<p style='color:#94a3b8;'>Loading...</p>";
+        panel.style.display = "block";
+        try {
+            const events = await window.ImvulaAuth.api(`/quantum/risks/${id}/history`);
+            if (events.length === 0) { panel.innerHTML = "<p style='color:#94a3b8;'>No history yet.</p>"; return; }
+            panel.innerHTML = "<h4 style='color:#fff; margin-bottom:12px;'>Change History</h4>" + events.map(e => `
+                <div class="timeline-item">
+                    <div class="timeline-date">${new Date(e.created_at).toLocaleString()}</div>
+                    <div class="timeline-action">${esc(e.action).replace('.', ' → ')}</div>
+                    <div style="color:#94a3b8; font-size:13px;">${esc(e.details || "—")}</div>
+                </div>
+            `).join("");
+        } catch (err) { panel.innerHTML = `<p style="color:#ef4444;">${esc(err.message)}</p>`; }
+    };
+
+    loadAll();
 })();
 </script>
 </body>
